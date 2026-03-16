@@ -36,5 +36,20 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Drizzle
+drizzle/meta/
+
+# Claude
+.claude/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+
 # Project plan (internal docs, not for repo)
 PLAN.md
