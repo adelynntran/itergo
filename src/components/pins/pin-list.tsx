@@ -145,6 +145,7 @@ export function PinList({
               <PinCard
                 key={pin.id}
                 pin={pin}
+                boardId={boardId}
                 isSelected={pin.id === selectedPinId}
                 onClick={() => onPinSelect(pin.id)}
               />

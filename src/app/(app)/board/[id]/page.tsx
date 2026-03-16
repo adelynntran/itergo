@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { trpc } from "@/lib/trpc/client";
+import { useBoardDetail } from "@/lib/api/hooks";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PinMap } from "@/components/pins/pin-map";
@@ -15,7 +15,6 @@ import {
   Map as MapIcon,
   ArrowLeft,
   Settings,
-  Share2,
   Users,
 } from "lucide-react";
 
@@ -27,10 +26,7 @@ export default function BoardPage() {
   const [showSettings, setShowSettings] = useState(false);
   const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
 
-  const { data: board, isLoading } = trpc.boards.get.useQuery(
-    { boardId: id },
-    { enabled: !!id }
-  );
+  const { data: board, isLoading } = useBoardDetail(id);
 
   if (isLoading) {
     return (
@@ -52,7 +48,7 @@ export default function BoardPage() {
   }
 
   const userRole = board.members.find(
-    (m) => m.userId === board.createdBy
+    (m: any) => m.userId === board.createdBy
   )?.role;
   const canEdit = userRole === "host" || userRole === "editor";
 

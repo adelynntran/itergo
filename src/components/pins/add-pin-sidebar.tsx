@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { trpc } from "@/lib/trpc/client";
+import { useCreatePin } from "@/lib/api/hooks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,15 +57,7 @@ export function AddPinSidebar({
   const [category, setCategory] = useState("");
   const [notes, setNotes] = useState("");
 
-  const utils = trpc.useUtils();
-
-  const createPin = trpc.pins.create.useMutation({
-    onSuccess: () => {
-      utils.boards.get.invalidate();
-      resetForm();
-      onOpenChange(false);
-    },
-  });
+  const createPin = useCreatePin();
 
   const resetForm = () => {
     setQuery("");
@@ -103,7 +95,6 @@ export function AddPinSidebar({
     []
   );
 
-  // Debounced search
   const handleSearchChange = (value: string) => {
     setQuery(value);
     setSelectedPlace(null);
@@ -131,19 +122,27 @@ export function AddPinSidebar({
 
     const { city, country } = extractCityCountry(selectedPlace);
 
-    createPin.mutate({
-      boardId,
-      name: selectedPlace.text,
-      latitude: selectedPlace.center[1],
-      longitude: selectedPlace.center[0],
-      address: selectedPlace.place_name,
-      city: city ?? undefined,
-      country: country ?? undefined,
-      category: category || undefined,
-      notes: notes || undefined,
-      placeId: selectedPlace.id,
-      sourceType: "search",
-    });
+    createPin.mutate(
+      {
+        boardId,
+        name: selectedPlace.text,
+        latitude: selectedPlace.center[1],
+        longitude: selectedPlace.center[0],
+        address: selectedPlace.place_name,
+        city: city ?? undefined,
+        country: country ?? undefined,
+        category: category || undefined,
+        notes: notes || undefined,
+        placeId: selectedPlace.id,
+        sourceType: "search",
+      },
+      {
+        onSuccess: () => {
+          resetForm();
+          onOpenChange(false);
+        },
+      }
+    );
   };
 
   return (

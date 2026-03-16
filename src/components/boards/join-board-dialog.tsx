@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { trpc } from "@/lib/trpc/client";
+import { useJoinByCode } from "@/lib/api/hooks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,26 +24,24 @@ export function JoinBoardDialog({ open, onOpenChange }: JoinBoardDialogProps) {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-  const utils = trpc.useUtils();
 
-  const joinByCode = trpc.boards.joinByCode.useMutation({
-    onSuccess: (board) => {
-      utils.boards.list.invalidate();
-      onOpenChange(false);
-      setCode("");
-      setError("");
-      router.push(`/board/${board.id}`);
-    },
-    onError: (err) => {
-      setError(err.message || "Invalid invite code");
-    },
-  });
+  const joinByCode = useJoinByCode();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     if (!code.trim()) return;
-    joinByCode.mutate({ code: code.trim().toUpperCase() });
+    joinByCode.mutate(code.trim().toUpperCase(), {
+      onSuccess: (board) => {
+        onOpenChange(false);
+        setCode("");
+        setError("");
+        router.push(`/board/${board.id}`);
+      },
+      onError: (err) => {
+        setError(err.message || "Invalid invite code");
+      },
+    });
   };
 
   return (

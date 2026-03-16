@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { trpc } from "@/lib/trpc/client";
+import { useCreateBoard } from "@/lib/api/hooks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,25 +28,26 @@ export function CreateBoardDialog({
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const router = useRouter();
-  const utils = trpc.useUtils();
 
-  const createBoard = trpc.boards.create.useMutation({
-    onSuccess: (board) => {
-      utils.boards.list.invalidate();
-      onOpenChange(false);
-      setName("");
-      setDescription("");
-      router.push(`/board/${board.id}`);
-    },
-  });
+  const createBoard = useCreateBoard();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    createBoard.mutate({
-      name: name.trim(),
-      description: description.trim() || undefined,
-    });
+    createBoard.mutate(
+      {
+        name: name.trim(),
+        description: description.trim() || undefined,
+      },
+      {
+        onSuccess: (board) => {
+          onOpenChange(false);
+          setName("");
+          setDescription("");
+          router.push(`/board/${board.id}`);
+        },
+      }
+    );
   };
 
   return (

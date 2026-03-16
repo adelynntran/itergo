@@ -1,0 +1,169 @@
+"use client";
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiFetch } from "./client";
+
+// ============ Query Keys ============
+
+export const queryKeys = {
+  boards: ["boards"] as const,
+  board: (id: string) => ["boards", id] as const,
+  boardPins: (boardId: string) => ["boards", boardId, "pins"] as const,
+  pinComments: (pinId: string) => ["pins", pinId, "comments"] as const,
+};
+
+// ============ Board Hooks ============
+
+export function useBoards() {
+  return useQuery({
+    queryKey: queryKeys.boards,
+    queryFn: () => apiFetch<any[]>("/api/boards"),
+  });
+}
+
+export function useBoardDetail(id: string) {
+  return useQuery({
+    queryKey: queryKeys.board(id),
+    queryFn: () => apiFetch<any>(`/api/boards/${id}`),
+    enabled: !!id,
+  });
+}
+
+export function useCreateBoard() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { name: string; description?: string }) =>
+      apiFetch<any>("/api/boards", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.boards });
+    },
+  });
+}
+
+export function useDeleteBoard() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (boardId: string) =>
+      apiFetch<void>(`/api/boards/${boardId}`, { method: "DELETE" }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.boards });
+    },
+  });
+}
+
+export function useJoinByCode() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (code: string) =>
+      apiFetch<any>("/api/boards/join", {
+        method: "POST",
+        body: JSON.stringify({ code }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.boards });
+    },
+  });
+}
+
+export function useGenerateInvite() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (boardId: string) =>
+      apiFetch<{ code: string; pin: string }>(`/api/boards/${boardId}/invite`, {
+        method: "POST",
+      }),
+    onSuccess: (_, boardId) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.board(boardId) });
+    },
+  });
+}
+
+export function useUpdateMemberRole() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      boardId,
+      userId,
+      role,
+    }: {
+      boardId: string;
+      userId: string;
+      role: "editor" | "viewer";
+    }) =>
+      apiFetch<void>(`/api/boards/${boardId}/members/${userId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ role }),
+      }),
+    onSuccess: (_, { boardId }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.board(boardId) });
+    },
+  });
+}
+
+export function useRemoveMember() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ boardId, userId }: { boardId: string; userId: string }) =>
+      apiFetch<void>(`/api/boards/${boardId}/members/${userId}`, {
+        method: "DELETE",
+      }),
+    onSuccess: (_, { boardId }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.board(boardId) });
+    },
+  });
+}
+
+// ============ Pin Hooks ============
+
+export function useCreatePin() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      boardId,
+      ...data
+    }: {
+      boardId: string;
+      name: string;
+      latitude?: number;
+      longitude?: number;
+      address?: string;
+      city?: string;
+      country?: string;
+      category?: string;
+      notes?: string;
+      placeId?: string;
+      sourceType?: string;
+    }) =>
+      apiFetch<any>(`/api/boards/${boardId}/pins`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    onSuccess: (_, { boardId }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.board(boardId) });
+    },
+  });
+}
+
+export function useVote() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      pinId,
+      voteType,
+    }: {
+      pinId: string;
+      voteType: "upvote" | "heart" | "must_do";
+      boardId: string; // for cache invalidation
+    }) =>
+      apiFetch<{ action: "added" | "removed" }>(`/api/pins/${pinId}/vote`, {
+        method: "POST",
+        body: JSON.stringify({ voteType }),
+      }),
+    onSuccess: (_, { boardId }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.board(boardId) });
+    },
+  });
+}

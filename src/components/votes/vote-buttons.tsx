@@ -1,11 +1,12 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { trpc } from "@/lib/trpc/client";
+import { useVote } from "@/lib/api/hooks";
 import { ThumbsUp, Heart, Star } from "lucide-react";
 
 interface VoteButtonsProps {
   pinId: string;
+  boardId: string;
   votes: Array<{ voteType: string; userId: string }>;
   compact?: boolean;
 }
@@ -31,15 +32,10 @@ const voteConfig = [
   },
 ];
 
-export function VoteButtons({ pinId, votes, compact }: VoteButtonsProps) {
+export function VoteButtons({ pinId, boardId, votes, compact }: VoteButtonsProps) {
   const { data: session } = useSession();
-  const utils = trpc.useUtils();
 
-  const voteMutation = trpc.pins.vote.useMutation({
-    onSuccess: () => {
-      utils.boards.get.invalidate();
-    },
-  });
+  const voteMutation = useVote();
 
   const userId = session?.user?.id;
 
@@ -56,7 +52,7 @@ export function VoteButtons({ pinId, votes, compact }: VoteButtonsProps) {
             key={type}
             onClick={(e) => {
               e.stopPropagation();
-              voteMutation.mutate({ pinId, voteType: type });
+              voteMutation.mutate({ pinId, voteType: type, boardId });
             }}
             disabled={voteMutation.isPending}
             className={`flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-xs transition-colors ${

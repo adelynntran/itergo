@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { trpc } from "@/lib/trpc/client";
+import {
+  useGenerateInvite,
+  useUpdateMemberRole,
+  useRemoveMember,
+} from "@/lib/api/hooks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -53,24 +57,15 @@ export function BoardSettingsSheet({
 }: BoardSettingsSheetProps) {
   const { data: session } = useSession();
   const [copied, setCopied] = useState(false);
-  const utils = trpc.useUtils();
 
   const currentUserId = session?.user?.id;
   const isHost = board.members.some(
     (m) => m.userId === currentUserId && m.role === "host"
   );
 
-  const generateInvite = trpc.boards.generateInvite.useMutation({
-    onSuccess: () => utils.boards.get.invalidate(),
-  });
-
-  const updateRole = trpc.boards.members.updateRole.useMutation({
-    onSuccess: () => utils.boards.get.invalidate(),
-  });
-
-  const removeMember = trpc.boards.members.remove.useMutation({
-    onSuccess: () => utils.boards.get.invalidate(),
-  });
+  const generateInvite = useGenerateInvite();
+  const updateRole = useUpdateMemberRole();
+  const removeMember = useRemoveMember();
 
   const copyInviteCode = () => {
     if (board.inviteCode) {
@@ -123,9 +118,7 @@ export function BoardSettingsSheet({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() =>
-                      generateInvite.mutate({ boardId: board.id })
-                    }
+                    onClick={() => generateInvite.mutate(board.id)}
                     disabled={generateInvite.isPending}
                   >
                     Regenerate Code
@@ -137,9 +130,7 @@ export function BoardSettingsSheet({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() =>
-                    generateInvite.mutate({ boardId: board.id })
-                  }
+                  onClick={() => generateInvite.mutate(board.id)}
                 >
                   Generate Invite Code
                 </Button>

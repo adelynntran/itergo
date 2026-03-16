@@ -17,6 +17,7 @@ interface PinCardProps {
     votes: Array<{ voteType: string; userId: string }>;
     comments: Array<unknown>;
   };
+  boardId: string;
   isSelected: boolean;
   onClick: () => void;
 }
@@ -33,7 +34,7 @@ const categoryEmoji: Record<string, string> = {
   other: "📍",
 };
 
-export function PinCard({ pin, isSelected, onClick }: PinCardProps) {
+export function PinCard({ pin, boardId, isSelected, onClick }: PinCardProps) {
   const location = [pin.city, pin.country].filter(Boolean).join(", ");
 
   return (
@@ -84,7 +85,7 @@ export function PinCard({ pin, isSelected, onClick }: PinCardProps) {
       )}
 
       <div className="mt-2 flex items-center justify-between">
-        <VoteButtons pinId={pin.id} votes={pin.votes} compact />
+        <VoteButtons pinId={pin.id} boardId={boardId} votes={pin.votes} compact />
         <div className="flex items-center gap-3 text-xs text-gray-400">
           {pin.comments.length > 0 && (
             <span className="flex items-center gap-0.5">

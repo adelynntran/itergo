@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { trpc } from "@/lib/trpc/client";
+import { useBoards, useDeleteBoard } from "@/lib/api/hooks";
 import { Button } from "@/components/ui/button";
 import { BoardCard } from "@/components/boards/board-card";
 import { CreateBoardDialog } from "@/components/boards/create-board-dialog";
@@ -14,16 +14,9 @@ export default function DashboardPage() {
   const [selectMode, setSelectMode] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
-  const { data: boards, isLoading } = trpc.boards.list.useQuery();
-  const utils = trpc.useUtils();
+  const { data: boards, isLoading } = useBoards();
 
-  const deleteBoard = trpc.boards.delete.useMutation({
-    onSuccess: () => {
-      utils.boards.list.invalidate();
-      setSelected(new Set());
-      setSelectMode(false);
-    },
-  });
+  const deleteBoard = useDeleteBoard();
 
   const toggleSelect = (id: string) => {
     setSelected((prev) => {
@@ -35,7 +28,14 @@ export default function DashboardPage() {
   };
 
   const handleDeleteSelected = () => {
-    selected.forEach((id) => deleteBoard.mutate({ boardId: id }));
+    selected.forEach((id) =>
+      deleteBoard.mutate(id, {
+        onSuccess: () => {
+          setSelected(new Set());
+          setSelectMode(false);
+        },
+      })
+    );
   };
 
   if (isLoading) {
