@@ -2,7 +2,14 @@
 
 import { Badge } from "@/components/ui/badge";
 import { VoteButtons } from "@/components/votes/vote-buttons";
-import { MapPin, MessageCircle, User } from "lucide-react";
+import { useDeletePin } from "@/lib/api/hooks";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MapPin, MessageCircle, User, MoreVertical, Trash2, Archive } from "lucide-react";
 
 interface PinCardProps {
   pin: {
@@ -19,6 +26,7 @@ interface PinCardProps {
   };
   boardId: string;
   isSelected: boolean;
+  canEdit: boolean;
   onClick: () => void;
 }
 
@@ -34,8 +42,15 @@ const categoryEmoji: Record<string, string> = {
   other: "📍",
 };
 
-export function PinCard({ pin, boardId, isSelected, onClick }: PinCardProps) {
+export function PinCard({
+  pin,
+  boardId,
+  isSelected,
+  canEdit,
+  onClick,
+}: PinCardProps) {
   const location = [pin.city, pin.country].filter(Boolean).join(", ");
+  const deletePin = useDeletePin();
 
   return (
     <div
@@ -75,6 +90,45 @@ export function PinCard({ pin, boardId, isSelected, onClick }: PinCardProps) {
           <Badge variant="secondary" className="shrink-0 text-xs capitalize">
             {pin.category}
           </Badge>
+        )}
+        {canEdit && (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+            >
+              <MoreVertical className="h-4 w-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deletePin.mutate({
+                    pinId: pin.id,
+                    boardId,
+                    action: "move_to_bin",
+                  });
+                }}
+              >
+                <Archive className="mr-2 h-4 w-4" />
+                Move to Bin
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-red-600 focus:text-red-600"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deletePin.mutate({
+                    pinId: pin.id,
+                    boardId,
+                    action: "delete",
+                  });
+                }}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Permanently
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
       </div>
 

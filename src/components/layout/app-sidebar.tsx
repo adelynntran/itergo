@@ -23,6 +23,8 @@ import {
   ChevronRight,
   Sparkles,
   Compass,
+  Archive,
+  Plane,
 } from "lucide-react";
 
 const navItems = [
@@ -36,6 +38,11 @@ const navItems = [
     href: "/dashboard?filter=shared",
     icon: Users,
   },
+  {
+    label: "Locations Bin",
+    href: "/locations-bin",
+    icon: Archive,
+  },
 ];
 
 export function AppSidebar() {
@@ -44,11 +51,12 @@ export function AppSidebar() {
   const { data: session } = useSession();
 
   const user = session?.user;
-  const initials = user?.name
-    ?.split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase() ?? "?";
+  const initials =
+    user?.name
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase() ?? "?";
 
   return (
     <aside
@@ -82,14 +90,21 @@ export function AppSidebar() {
       {/* Mode Toggle */}
       {!collapsed && (
         <div className="border-b px-3 py-3">
-          <div className="flex rounded-lg bg-gray-100 p-1">
-            <button className="flex-1 rounded-md bg-white px-3 py-1.5 text-sm font-medium text-gray-900 shadow-sm">
+          <div className="space-y-1 rounded-lg bg-gray-100 p-1">
+            <button className="flex w-full items-center justify-center rounded-md bg-white px-3 py-1.5 text-sm font-medium text-gray-900 shadow-sm">
               <Cloud className="mr-1.5 inline h-3.5 w-3.5" />
               Dream
             </button>
-            <button className="flex-1 rounded-md px-3 py-1.5 text-sm font-medium text-gray-500 hover:text-gray-700">
+            <button className="flex w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-800">
               <Sparkles className="mr-1.5 inline h-3.5 w-3.5" />
-              Execute
+              Execution
+            </button>
+            <button
+              className="flex w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium text-gray-500 hover:text-gray-700"
+              onClick={() => window.alert("Travel mode is coming soon.")}
+            >
+              <Plane className="mr-1.5 inline h-3.5 w-3.5" />
+              Travel (Coming Soon)
             </button>
           </div>
         </div>
@@ -98,7 +113,10 @@ export function AppSidebar() {
       {/* Navigation */}
       <nav className="flex-1 space-y-1 px-2 py-3">
         {navItems.map((item) => {
-          const isActive = pathname === item.href || (item.href === "/dashboard" && pathname === "/dashboard");
+          const isActive =
+            pathname === item.href ||
+            (item.href === "/dashboard" && pathname === "/dashboard") ||
+            (item.href === "/locations-bin" && pathname === "/locations-bin");
           return (
             <Link
               key={item.href}
@@ -135,31 +153,27 @@ export function AppSidebar() {
       <div className="border-t px-3 py-3">
         <DropdownMenu>
           <DropdownMenuTrigger
-              className={`flex w-full items-center gap-3 rounded-lg px-2 py-2 hover:bg-gray-100 ${
-                collapsed ? "justify-center" : ""
-              }`}
-            >
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={user?.image ?? undefined} />
-                <AvatarFallback className="bg-indigo-100 text-indigo-700 text-xs">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              {!collapsed && (
-                <div className="flex-1 text-left">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {user?.name}
-                  </p>
-                  <p className="text-xs text-gray-500 truncate">
-                    {user?.email}
-                  </p>
-                </div>
-              )}
+            className={`flex w-full items-center gap-3 rounded-lg px-2 py-2 hover:bg-gray-100 ${
+              collapsed ? "justify-center" : ""
+            }`}
+          >
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={user?.image ?? undefined} />
+              <AvatarFallback className="bg-indigo-100 text-xs text-indigo-700">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            {!collapsed && (
+              <div className="flex-1 text-left">
+                <p className="truncate text-sm font-medium text-gray-900">
+                  {user?.name}
+                </p>
+                <p className="truncate text-xs text-gray-500">{user?.email}</p>
+              </div>
+            )}
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem
-              onClick={() => window.location.href = "/settings"}
-            >
+            <DropdownMenuItem onClick={() => (window.location.href = "/settings")}>
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </DropdownMenuItem>

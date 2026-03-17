@@ -8,6 +8,7 @@ import type {
   comments,
   commentReactions,
   pinMedia,
+  locationsBin,
 } from "@/server/db/schema";
 
 export type User = InferSelectModel<typeof users>;
@@ -18,6 +19,7 @@ export type PinVote = InferSelectModel<typeof pinVotes>;
 export type Comment = InferSelectModel<typeof comments>;
 export type CommentReaction = InferSelectModel<typeof commentReactions>;
 export type PinMedia = InferSelectModel<typeof pinMedia>;
+export type LocationBinItem = InferSelectModel<typeof locationsBin>;
 
 export type BoardRole = "host" | "editor" | "viewer";
 export type VoteType = "upvote" | "heart" | "must_do";

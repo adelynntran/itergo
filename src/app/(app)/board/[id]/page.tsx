@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useBoardDetail } from "@/lib/api/hooks";
+import { useBoardDetail, useUpdateBoardMode } from "@/lib/api/hooks";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PinMap } from "@/components/pins/pin-map";
@@ -16,6 +16,9 @@ import {
   ArrowLeft,
   Settings,
   Users,
+  Cloud,
+  Sparkles,
+  Plane,
 } from "lucide-react";
 
 export default function BoardPage() {
@@ -27,6 +30,7 @@ export default function BoardPage() {
   const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
 
   const { data: board, isLoading } = useBoardDetail(id);
+  const updateBoardMode = useUpdateBoardMode();
 
   if (isLoading) {
     return (
@@ -47,9 +51,8 @@ export default function BoardPage() {
     );
   }
 
-  const userRole = board.members.find(
-    (m: any) => m.userId === board.createdBy
-  )?.role;
+  const currentMode = board.boardMode ?? "dream";
+  const userRole = board.currentUserRole;
   const canEdit = userRole === "host" || userRole === "editor";
 
   return (
@@ -65,9 +68,7 @@ export default function BoardPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-lg font-semibold text-gray-900">
-              {board.name}
-            </h1>
+            <h1 className="text-lg font-semibold text-gray-900">{board.name}</h1>
             {board.description && (
               <p className="text-xs text-gray-500">{board.description}</p>
             )}
@@ -79,6 +80,45 @@ export default function BoardPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <div className="hidden items-center gap-1 rounded-md border bg-gray-50 p-1 sm:flex">
+            <Button
+              variant={currentMode === "dream" ? "secondary" : "ghost"}
+              size="sm"
+              className="h-7 px-2"
+              disabled
+            >
+              <Cloud className="mr-1 h-3 w-3" />
+              Dream
+            </Button>
+            <Button
+              variant={currentMode === "execution" ? "secondary" : "ghost"}
+              size="sm"
+              className="h-7 px-2"
+              disabled={
+                !canEdit ||
+                currentMode === "execution" ||
+                updateBoardMode.isPending
+              }
+              onClick={() =>
+                updateBoardMode.mutate({
+                  boardId: board.id,
+                  boardMode: "execution",
+                })
+              }
+            >
+              <Sparkles className="mr-1 h-3 w-3" />
+              Execution
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2"
+              onClick={() => window.alert("Travel mode is coming soon.")}
+            >
+              <Plane className="mr-1 h-3 w-3" />
+              Travel
+            </Button>
+          </div>
           <Button
             variant="ghost"
             size="icon"

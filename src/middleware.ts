@@ -5,5 +5,6 @@ export const config = {
     "/dashboard/:path*",
     "/board/:path*",
     "/settings/:path*",
+    "/locations-bin/:path*",
   ],
 };

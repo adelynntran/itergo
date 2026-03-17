@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "./client";
+import type { LocationBinItem } from "@/types";
 
 // ============ Query Keys ============
 
@@ -10,6 +11,7 @@ export const queryKeys = {
   board: (id: string) => ["boards", id] as const,
   boardPins: (boardId: string) => ["boards", boardId, "pins"] as const,
   pinComments: (pinId: string) => ["pins", pinId, "comments"] as const,
+  locationsBin: ["locations-bin"] as const,
 };
 
 // ============ Board Hooks ============
@@ -50,6 +52,27 @@ export function useDeleteBoard() {
       apiFetch<void>(`/api/boards/${boardId}`, { method: "DELETE" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.boards });
+    },
+  });
+}
+
+export function useUpdateBoardMode() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      boardId,
+      boardMode,
+    }: {
+      boardId: string;
+      boardMode: "dream" | "execution" | "travel";
+    }) =>
+      apiFetch<{ id: string; boardMode: string }>(`/api/boards/${boardId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ boardMode }),
+      }),
+    onSuccess: (_, { boardId }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.boards });
+      queryClient.invalidateQueries({ queryKey: queryKeys.board(boardId) });
     },
   });
 }
@@ -164,6 +187,74 @@ export function useVote() {
       }),
     onSuccess: (_, { boardId }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.board(boardId) });
+    },
+  });
+}
+
+export function useDeletePin() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      pinId,
+      action,
+    }: {
+      pinId: string;
+      boardId: string;
+      action: "delete" | "move_to_bin";
+    }) =>
+      apiFetch<void>(`/api/pins/${pinId}`, {
+        method: "DELETE",
+        body: JSON.stringify({ action }),
+      }),
+    onSuccess: (_, { boardId, action }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.board(boardId) });
+      if (action === "move_to_bin") {
+        queryClient.invalidateQueries({ queryKey: queryKeys.locationsBin });
+      }
+    },
+  });
+}
+
+export function useLocationsBin() {
+  return useQuery({
+    queryKey: queryKeys.locationsBin,
+    queryFn: () => apiFetch<LocationBinItem[]>("/api/locations-bin"),
+  });
+}
+
+export function useRestoreLocation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      itemId,
+      targetPlanCardId,
+    }: {
+      itemId: string;
+      targetPlanCardId: string;
+    }) =>
+      apiFetch<{ id: string }>(`/api/locations-bin/${itemId}/restore`, {
+        method: "POST",
+        body: JSON.stringify({ targetPlanCardId }),
+      }),
+    onSuccess: (_, { targetPlanCardId }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.locationsBin });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.board(targetPlanCardId),
+      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.boards });
+    },
+  });
+}
+
+export function useDeleteLocationBinItem() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (itemId: string) =>
+      apiFetch<void>(`/api/locations-bin/${itemId}`, {
+        method: "DELETE",
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.locationsBin });
     },
   });
 }

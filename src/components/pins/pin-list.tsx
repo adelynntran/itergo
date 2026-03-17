@@ -5,7 +5,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { PinCard } from "@/components/pins/pin-card";
 import { Search, SlidersHorizontal } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -147,6 +146,7 @@ export function PinList({
                 pin={pin}
                 boardId={boardId}
                 isSelected={pin.id === selectedPinId}
+                canEdit={canEdit}
                 onClick={() => onPinSelect(pin.id)}
               />
             ))

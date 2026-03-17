@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useCallback, useMemo } from "react";
+import { useRef, useMemo } from "react";
 import MapGL, { Marker, NavigationControl } from "react-map-gl/mapbox";
 import { MapPin } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";

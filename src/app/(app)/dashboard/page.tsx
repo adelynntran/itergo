@@ -1,12 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { useBoards, useDeleteBoard } from "@/lib/api/hooks";
+import {
+  useBoards,
+  useDeleteBoard,
+  useUpdateBoardMode,
+} from "@/lib/api/hooks";
 import { Button } from "@/components/ui/button";
 import { BoardCard } from "@/components/boards/board-card";
 import { CreateBoardDialog } from "@/components/boards/create-board-dialog";
 import { JoinBoardDialog } from "@/components/boards/join-board-dialog";
-import { Plus, CheckSquare, Trash2, UserPlus } from "lucide-react";
+import {
+  Plus,
+  CheckSquare,
+  Trash2,
+  UserPlus,
+  Sparkles,
+  GitMerge,
+} from "lucide-react";
 
 export default function DashboardPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -17,6 +28,7 @@ export default function DashboardPage() {
   const { data: boards, isLoading } = useBoards();
 
   const deleteBoard = useDeleteBoard();
+  const updateBoardMode = useUpdateBoardMode();
 
   const toggleSelect = (id: string) => {
     setSelected((prev) => {
@@ -38,6 +50,23 @@ export default function DashboardPage() {
     );
   };
 
+  const handleMoveToExecution = () => {
+    selected.forEach((id) =>
+      updateBoardMode.mutate(
+        {
+          boardId: id,
+          boardMode: "execution",
+        },
+        {
+          onSuccess: () => {
+            setSelected(new Set());
+            setSelectMode(false);
+          },
+        }
+      )
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center p-8">
@@ -51,7 +80,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dream Boards</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Plan Cards</h1>
           <p className="mt-1 text-sm text-gray-500">
             Collect travel inspiration with your friends
           </p>
@@ -60,9 +89,27 @@ export default function DashboardPage() {
           {selectMode ? (
             <>
               <Button
-                variant="destructive"
+                variant="secondary"
+                size="sm"
+                disabled={selected.size === 0 || updateBoardMode.isPending}
+                onClick={handleMoveToExecution}
+              >
+                <Sparkles className="mr-1.5 h-4 w-4" />
+                Move to Execution ({selected.size})
+              </Button>
+              <Button
+                variant="outline"
                 size="sm"
                 disabled={selected.size === 0}
+                onClick={() => window.alert("Merge Plan Cards is coming soon.")}
+              >
+                <GitMerge className="mr-1.5 h-4 w-4" />
+                Merge (Coming Soon)
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={selected.size === 0 || deleteBoard.isPending}
                 onClick={handleDeleteSelected}
               >
                 <Trash2 className="mr-1.5 h-4 w-4" />
@@ -125,10 +172,10 @@ export default function DashboardPage() {
             <Plus className="h-8 w-8 text-indigo-600" />
           </div>
           <h3 className="mt-4 text-lg font-medium text-gray-900">
-            No dream boards yet
+            No plan cards yet
           </h3>
           <p className="mt-1 text-sm text-gray-500">
-            Create your first board to start collecting travel ideas
+            Create your first plan card to start collecting travel ideas
           </p>
           <div className="mt-4 flex gap-2">
             <Button

@@ -18,6 +18,7 @@ interface BoardCardProps {
     description: string | null;
     coverImage: string | null;
     role: string;
+    boardMode?: "dream" | "execution" | "travel";
     memberCount: number;
     pinCount: number;
   };
@@ -38,12 +39,20 @@ const roleColors: Record<string, string> = {
   viewer: "bg-gray-100 text-gray-700",
 };
 
+const modeColors: Record<string, string> = {
+  dream: "bg-indigo-100 text-indigo-700",
+  execution: "bg-emerald-100 text-emerald-700",
+  travel: "bg-orange-100 text-orange-700",
+};
+
 export function BoardCard({
   board,
   selectMode,
   isSelected,
   onToggleSelect,
 }: BoardCardProps) {
+  const boardMode = board.boardMode ?? "dream";
+
   const content = (
     <Card
       className={`group cursor-pointer transition-all hover:shadow-md ${
@@ -79,7 +88,13 @@ export function BoardCard({
             </div>
           </div>
         )}
-        <div className="absolute right-3 top-3">
+        <div className="absolute right-3 top-3 flex gap-1.5">
+          <Badge
+            variant="secondary"
+            className={`text-xs ${modeColors[boardMode] ?? ""}`}
+          >
+            {boardMode}
+          </Badge>
           <Badge
             variant="secondary"
             className={`text-xs ${roleColors[board.role] ?? ""}`}
@@ -106,8 +121,7 @@ export function BoardCard({
           </span>
           <span className="flex items-center gap-1">
             <Users className="h-3.5 w-3.5" />
-            {board.memberCount}{" "}
-            {board.memberCount === 1 ? "member" : "members"}
+            {board.memberCount} {board.memberCount === 1 ? "member" : "members"}
           </span>
         </div>
       </CardContent>

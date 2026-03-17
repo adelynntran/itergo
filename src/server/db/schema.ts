@@ -34,6 +34,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   sessions: many(sessions),
   boardMembers: many(boardMembers),
   pins: many(pins),
+  locationsBin: many(locationsBin),
   pinVotes: many(pinVotes),
   comments: many(comments),
 }));
@@ -95,6 +96,11 @@ export const dreamBoards = pgTable("dream_boards", {
   name: text("name").notNull(),
   description: text("description"),
   coverImage: text("cover_image"),
+  boardMode: text("board_mode").notNull().default("dream"),
+  executionStartedAt: timestamp("execution_started_at", {
+    withTimezone: true,
+  }),
+  travelStartedAt: timestamp("travel_started_at", { withTimezone: true }),
   visibility: text("visibility").notNull().default("group"),
   inviteCode: text("invite_code").unique(),
   invitePin: text("invite_pin"),
@@ -113,6 +119,7 @@ export const dreamBoardsRelations = relations(dreamBoards, ({ one, many }) => ({
   }),
   members: many(boardMembers),
   pins: many(pins),
+  locationsBin: many(locationsBin),
 }));
 
 export const boardMembers = pgTable(
@@ -180,6 +187,51 @@ export const pinsRelations = relations(pins, ({ one, many }) => ({
   media: many(pinMedia),
   votes: many(pinVotes),
   comments: many(comments),
+}));
+
+export const locationsBin = pgTable("locations_bin", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  ownerUserId: uuid("owner_user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  removedBy: uuid("removed_by")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  sourceBoardId: uuid("source_board_id").references(() => dreamBoards.id, {
+    onDelete: "set null",
+  }),
+  sourceBoardName: text("source_board_name"),
+  name: text("name").notNull(),
+  address: text("address"),
+  city: text("city"),
+  country: text("country"),
+  latitude: doublePrecision("latitude"),
+  longitude: doublePrecision("longitude"),
+  placeId: text("place_id"),
+  category: text("category"),
+  notes: text("notes"),
+  sourceType: text("source_type").default("search"),
+  sourceUrl: text("source_url"),
+  sourceMeta: jsonb("source_meta").default({}),
+  aiExtracted: boolean("ai_extracted").default(false),
+  removedAt: timestamp("removed_at", { withTimezone: true }).defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+export const locationsBinRelations = relations(locationsBin, ({ one }) => ({
+  owner: one(users, {
+    fields: [locationsBin.ownerUserId],
+    references: [users.id],
+  }),
+  remover: one(users, {
+    fields: [locationsBin.removedBy],
+    references: [users.id],
+  }),
+  sourceBoard: one(dreamBoards, {
+    fields: [locationsBin.sourceBoardId],
+    references: [dreamBoards.id],
+  }),
 }));
 
 export const pinMedia = pgTable("pin_media", {
