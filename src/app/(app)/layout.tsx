@@ -2,7 +2,6 @@
 
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import { AppSidebar } from "@/components/layout/app-sidebar";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { status } = useSession({
@@ -21,9 +20,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="paper-texture flex min-h-screen bg-background">
-      <AppSidebar />
-      <main className="relative flex-1 overflow-auto">{children}</main>
+    <div className="paper-texture min-h-screen bg-background">
+      <main className="relative min-h-screen overflow-auto">{children}</main>
     </div>
   );
 }
