@@ -1,127 +1,124 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Users, Crown, Edit3, Eye } from "lucide-react";
+import { MapPin, Users, Clock } from "lucide-react";
 
 interface BoardCardProps {
   board: {
     id: string;
     name: string;
     description: string | null;
-    coverImage: string | null;
     role: string;
     boardMode?: "dream" | "execution" | "travel";
     memberCount: number;
     pinCount: number;
+    pins?: Array<{
+      id: string;
+      name: string;
+      category: string | null;
+    }>;
   };
   selectMode?: boolean;
   isSelected?: boolean;
   onToggleSelect?: () => void;
 }
 
-const roleIcons: Record<string, React.ReactNode> = {
-  host: <Crown className="h-3 w-3" />,
-  editor: <Edit3 className="h-3 w-3" />,
-  viewer: <Eye className="h-3 w-3" />,
-};
-
-const roleColors: Record<string, string> = {
-  host: "bg-amber-100 text-amber-700",
-  editor: "bg-blue-100 text-blue-700",
-  viewer: "bg-gray-100 text-gray-700",
-};
-
 const modeColors: Record<string, string> = {
-  dream: "bg-indigo-100 text-indigo-700",
-  execution: "bg-emerald-100 text-emerald-700",
-  travel: "bg-orange-100 text-orange-700",
+  dream: "bg-[hsl(var(--olive))]/15 text-[hsl(var(--olive))]",
+  execution: "bg-[hsl(var(--slate))]/15 text-[hsl(var(--slate))]",
+  travel: "bg-primary/15 text-primary",
 };
 
-export function BoardCard({
-  board,
-  selectMode,
-  isSelected,
-  onToggleSelect,
-}: BoardCardProps) {
+const categoryEmoji: Record<string, string> = {
+  food: "🍽",
+  nature: "🌿",
+  culture: "🏛",
+  nightlife: "🌙",
+  shopping: "🛍",
+  accommodation: "🏨",
+  activity: "⚡",
+  transport: "🚗",
+  other: "📍",
+};
+
+const coverGradients = [
+  "from-[#d3c8b7] to-[#c6b89f]",
+  "from-[#d1bdad] to-[#bc9a87]",
+  "from-[#c8d0db] to-[#aeb9c7]",
+  "from-[#d9cec0] to-[#bfa78d]",
+];
+
+export function BoardCard({ board, selectMode, isSelected, onToggleSelect }: BoardCardProps) {
   const boardMode = board.boardMode ?? "dream";
+  const coverItems = board.pins?.slice(0, 4) ?? [];
 
   const content = (
     <Card
-      className={`group cursor-pointer transition-all hover:shadow-md ${
-        isSelected ? "ring-2 ring-indigo-600" : ""
+      className={`overflow-hidden border border-border bg-card p-0 text-left transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
+        isSelected ? "ring-2 ring-primary" : ""
       }`}
     >
-      {/* Cover image placeholder */}
-      <div className="relative h-32 rounded-t-lg bg-gradient-to-br from-indigo-400 to-purple-500">
-        {selectMode && (
-          <div className="absolute left-3 top-3">
-            <div
-              className={`h-5 w-5 rounded border-2 ${
-                isSelected
-                  ? "border-indigo-600 bg-indigo-600"
-                  : "border-white bg-white/30"
-              } flex items-center justify-center`}
-            >
-              {isSelected && (
-                <svg
-                  className="h-3 w-3 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={3}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              )}
-            </div>
+      <div className="relative h-44 overflow-hidden bg-accent">
+        {coverItems.length > 0 ? (
+          <div className="grid h-full grid-cols-2 grid-rows-2">
+            {coverItems.map((pin, i) => (
+              <div key={pin.id} className={`relative bg-gradient-to-br ${coverGradients[i % coverGradients.length]} p-2`}>
+                <span className="absolute right-2 top-2 text-sm">
+                  {pin.category ? categoryEmoji[pin.category] ?? "📍" : "📍"}
+                </span>
+                <p className="line-clamp-2 text-xs font-medium text-foreground/80">
+                  {pin.name}
+                </p>
+              </div>
+            ))}
+            {Array.from({ length: Math.max(0, 4 - coverItems.length) }).map((_, i) => (
+              <div
+                key={`empty-${i}`}
+                className={`flex items-center justify-center bg-gradient-to-br ${coverGradients[(coverItems.length + i) % coverGradients.length]}`}
+              >
+                <MapPin className="h-4 w-4 text-foreground/40" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex h-full flex-col items-center justify-center bg-gradient-to-br from-accent via-card to-muted">
+            <span className="text-3xl">🌍</span>
+            <p className="mt-2 text-xs text-muted-foreground">No pins yet</p>
           </div>
         )}
-        <div className="absolute right-3 top-3 flex gap-1.5">
-          <Badge
-            variant="secondary"
-            className={`text-xs ${modeColors[boardMode] ?? ""}`}
-          >
+
+        <div className="absolute left-3 top-3 flex items-center gap-2">
+          <Badge variant="secondary" className={`text-xs capitalize ${modeColors[boardMode] ?? ""}`}>
             {boardMode}
           </Badge>
-          <Badge
-            variant="secondary"
-            className={`text-xs ${roleColors[board.role] ?? ""}`}
-          >
-            {roleIcons[board.role]}
-            <span className="ml-1 capitalize">{board.role}</span>
+          <Badge variant="outline" className="text-xs capitalize bg-background/70 backdrop-blur-sm">
+            {board.role}
           </Badge>
         </div>
       </div>
 
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base">{board.name}</CardTitle>
-        {board.description && (
-          <CardDescription className="line-clamp-2 text-xs">
-            {board.description}
-          </CardDescription>
-        )}
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center gap-4 text-xs text-gray-500">
+      <CardContent className="space-y-3 px-4 py-4">
+        <div>
+          <h3 className="font-display text-xl leading-none text-foreground">{board.name}</h3>
+          {board.description && (
+            <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{board.description}</p>
+          )}
+        </div>
+
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <MapPin className="h-3.5 w-3.5" />
-            {board.pinCount} {board.pinCount === 1 ? "pin" : "pins"}
+            {board.pinCount}
           </span>
           <span className="flex items-center gap-1">
             <Users className="h-3.5 w-3.5" />
-            {board.memberCount} {board.memberCount === 1 ? "member" : "members"}
+            {board.memberCount}
+          </span>
+          <span className="ml-auto flex items-center gap-1">
+            <Clock className="h-3.5 w-3.5" />
+            Active
           </span>
         </div>
       </CardContent>
