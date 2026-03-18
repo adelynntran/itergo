@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   useBoards,
   useDeleteBoard,
@@ -19,15 +20,33 @@ import {
   GitMerge,
   Search,
   Archive,
+  Cloud,
+  Map as MapIcon,
+  Compass,
+  BookOpen,
 } from "lucide-react";
 import Link from "next/link";
 
+type BoardModeView = "dream" | "execution" | "travel" | "momento";
+
 export default function DashboardPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isJoinOpen, setIsJoinOpen] = useState(false);
   const [selectMode, setSelectMode] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
+  const modeParam = searchParams.get("mode");
+  const filterParam = searchParams.get("filter");
+  const activeMode: BoardModeView =
+    modeParam === "execution" ||
+    modeParam === "travel" ||
+    modeParam === "momento" ||
+    modeParam === "dream"
+      ? modeParam
+      : "dream";
+  const showSharedOnly = filterParam === "shared";
 
   const { data: boards, isLoading } = useBoards();
   const deleteBoard = useDeleteBoard();
@@ -36,13 +55,24 @@ export default function DashboardPage() {
   const filteredBoards = useMemo(() => {
     if (!boards) return [];
     const q = search.trim().toLowerCase();
-    if (!q) return boards;
-    return boards.filter(
+    const lifecycleFiltered = boards.filter((board) => {
+      const boardMode = board.boardMode ?? "dream";
+      if (activeMode === "momento") return false;
+      if (activeMode === "dream") return boardMode === "dream";
+      if (activeMode === "execution") return boardMode === "execution";
+      if (activeMode === "travel") return boardMode === "travel";
+      return false;
+    });
+    const ownershipFiltered = lifecycleFiltered.filter((board) =>
+      showSharedOnly ? board.role !== "host" : true
+    );
+    if (!q) return ownershipFiltered;
+    return ownershipFiltered.filter(
       (board) =>
         board.name.toLowerCase().includes(q) ||
         board.description?.toLowerCase().includes(q)
     );
-  }, [boards, search]);
+  }, [boards, search, activeMode, showSharedOnly]);
 
   const toggleSelect = (id: string) => {
     setSelected((prev) => {
@@ -81,6 +111,15 @@ export default function DashboardPage() {
     );
   };
 
+  const setMode = (mode: BoardModeView) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("mode", mode);
+    params.delete("filter");
+    router.push(`/dashboard?${params.toString()}`);
+    setSelectMode(false);
+    setSelected(new Set());
+  };
+
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center p-8">
@@ -107,25 +146,68 @@ export default function DashboardPage() {
       </div>
 
       <div className="animate-page-fade mx-auto max-w-6xl p-6 lg:p-8">
+        <div className="mb-6 flex justify-center">
+          <div className="flex items-center gap-1 rounded-full border border-border bg-card/90 p-1 shadow-sm">
+            {[
+              { id: "dream", label: "Dream", icon: Cloud, active: "bg-[hsl(var(--olive))]/15 text-[hsl(var(--olive))]" },
+              { id: "execution", label: "Execution", icon: MapIcon, active: "bg-[hsl(var(--slate))]/15 text-[hsl(var(--slate))]" },
+              { id: "travel", label: "Travel", icon: Compass, active: "bg-primary/15 text-primary" },
+              { id: "momento", label: "Momento", icon: BookOpen, active: "bg-[hsl(var(--plum))]/15 text-[hsl(var(--plum))]" },
+            ].map((mode) => {
+              const Icon = mode.icon;
+              const isActive = activeMode === mode.id;
+              return (
+                <button
+                  key={mode.id}
+                  onClick={() => setMode(mode.id as BoardModeView)}
+                  className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm transition-all ${
+                    isActive ? `${mode.active} shadow-sm` : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span className="hidden sm:inline">{mode.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="font-display text-3xl text-foreground">Your Trips</h2>
+            <h2 className="font-display text-3xl text-foreground">
+              {activeMode === "dream" && "Dream Plans"}
+              {activeMode === "execution" && "Execution Plans"}
+              {activeMode === "travel" && "Travel Plans"}
+              {activeMode === "momento" && "Momento Plans"}
+            </h2>
             <p className="text-sm text-muted-foreground">
-              {boards?.length ?? 0} plans - where to next?
+              {filteredBoards.length} plans in this mode
             </p>
           </div>
           <div className="flex items-center gap-2">
             {selectMode ? (
               <>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  disabled={selected.size === 0 || updateBoardMode.isPending}
-                  onClick={handleMoveToExecution}
-                >
-                  <Sparkles className="mr-1.5 h-4 w-4" />
-                  Move to Execution ({selected.size})
-                </Button>
+                {activeMode === "dream" && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    disabled={selected.size === 0 || updateBoardMode.isPending}
+                    onClick={handleMoveToExecution}
+                  >
+                    <Sparkles className="mr-1.5 h-4 w-4" />
+                    Move to Execution ({selected.size})
+                  </Button>
+                )}
+                {activeMode !== "dream" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled
+                    onClick={() => window.alert("Further mode promotion is coming soon.")}
+                  >
+                    Move to Next Mode (Soon)
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
@@ -165,10 +247,12 @@ export default function DashboardPage() {
                   <CheckSquare className="mr-1.5 h-4 w-4" />
                   Select
                 </Button>
-                <Button size="sm" onClick={() => setIsCreateOpen(true)}>
-                  <Plus className="mr-1.5 h-4 w-4" />
-                  New Trip
-                </Button>
+                {activeMode === "dream" && (
+                  <Button size="sm" onClick={() => setIsCreateOpen(true)}>
+                    <Plus className="mr-1.5 h-4 w-4" />
+                    New Trip
+                  </Button>
+                )}
               </>
             )}
           </div>
@@ -195,21 +279,28 @@ export default function DashboardPage() {
                 onToggleSelect={() => toggleSelect(board.id)}
               />
             ))}
-            <button
-              onClick={() => setIsCreateOpen(true)}
-              className="flex min-h-[280px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-card/40 transition-all hover:border-primary/50 hover:shadow-sm"
-            >
-              <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-accent">
-                <Plus className="h-6 w-6 text-muted-foreground" />
-              </div>
-              <p className="font-display text-lg text-foreground">Start a new trip</p>
-              <p className="text-xs text-muted-foreground">Dream something up</p>
-            </button>
+            {activeMode === "dream" && (
+              <button
+                onClick={() => setIsCreateOpen(true)}
+                className="flex min-h-[280px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-card/40 transition-all hover:border-primary/50 hover:shadow-sm"
+              >
+                <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-accent">
+                  <Plus className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <p className="font-display text-lg text-foreground">Start a new trip</p>
+                <p className="text-xs text-muted-foreground">Dream something up</p>
+              </button>
+            )}
           </div>
         ) : (
           <div className="rounded-xl border-2 border-dashed border-border py-16 text-center">
-            <p className="font-display text-2xl text-foreground">No trips found</p>
-            <p className="mt-1 text-sm text-muted-foreground">Create your first plan card</p>
+            <p className="font-display text-2xl text-foreground">No plans in this mode</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {activeMode === "dream" && "Create a plan card and start idea dumping pins."}
+              {activeMode === "execution" && "Promote a dream plan to execution to see it here."}
+              {activeMode === "travel" && "Travel mode plans will appear here after promotion."}
+              {activeMode === "momento" && "Momento plans will appear here in a future release."}
+            </p>
           </div>
         )}
 

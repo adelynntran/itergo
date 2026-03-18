@@ -169,12 +169,22 @@ export default function BoardPage() {
   }
 
   const changeMode = (nextMode: ViewMode) => {
+    if (!board) return;
+    if (nextMode === viewMode) return;
+
+    if (nextMode === "momento") {
+      window.alert("Momento mode is coming soon.");
+      return;
+    }
+
     if (nextMode === "execution") {
       if (board.boardMode !== "execution" && canEdit) {
         updateBoardMode.mutate(
           { boardId: board.id, boardMode: "execution" },
           { onSuccess: () => setViewMode("execution") }
         );
+      } else if (board.boardMode !== "execution") {
+        window.alert("Only host/editor can move this plan to execution.");
       } else {
         setViewMode("execution");
       }
@@ -182,7 +192,16 @@ export default function BoardPage() {
     }
 
     if (nextMode === "travel") {
-      setViewMode("travel");
+      if (board.boardMode === "travel") {
+        setViewMode("travel");
+      } else {
+        window.alert("Travel mode will unlock when this plan is promoted from execution.");
+      }
+      return;
+    }
+
+    if (nextMode === "dream" && board.boardMode !== "dream") {
+      window.alert("This plan has already moved forward and is no longer in Dream mode.");
       return;
     }
 
@@ -231,14 +250,21 @@ export default function BoardPage() {
           {(Object.keys(modeMeta) as ViewMode[]).map((mode) => {
             const Icon = modeMeta[mode].icon;
             const active = viewMode === mode;
+            const disabled =
+              (mode === "dream" && board.boardMode !== "dream") ||
+              (mode === "travel" && board.boardMode !== "travel") ||
+              mode === "momento";
             return (
               <button
                 key={mode}
                 onClick={() => changeMode(mode)}
+                disabled={disabled && !active}
                 className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm transition-all ${
                   active
                     ? `${modeMeta[mode].activeClass} shadow-sm`
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                    : disabled
+                      ? "cursor-not-allowed text-muted-foreground/60"
+                      : "text-muted-foreground hover:bg-accent hover:text-foreground"
                 }`}
               >
                 <Icon className="h-4 w-4" />

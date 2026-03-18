@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -48,7 +48,10 @@ const navItems = [
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
+  const currentMode = searchParams.get("mode") ?? "dream";
 
   const user = session?.user;
   const initials =
@@ -57,6 +60,10 @@ export function AppSidebar() {
       .map((n) => n[0])
       .join("")
       .toUpperCase() ?? "?";
+
+  const goToMode = (mode: "dream" | "execution" | "travel" | "momento") => {
+    router.push(`/dashboard?mode=${mode}`);
+  };
 
   return (
     <aside
@@ -101,25 +108,49 @@ export function AppSidebar() {
             <p className="mb-2 px-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
               Board Mode
             </p>
-            <button className="flex w-full items-center justify-start rounded-xl bg-primary/10 px-3 py-2 text-sm font-medium text-primary">
+            <button
+              onClick={() => goToMode("dream")}
+              className={`flex w-full items-center justify-start rounded-xl px-3 py-2 text-sm font-medium ${
+                currentMode === "dream"
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground transition-colors hover:bg-accent/80 hover:text-foreground"
+              }`}
+            >
               <Cloud className="mr-1.5 inline h-3.5 w-3.5" />
               Dream
             </button>
             <button
-              className="mt-1 flex w-full items-center justify-start rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent/80 hover:text-foreground"
-              onClick={() =>
-                window.alert("Execution mode is managed per plan card from dashboard and board views.")
-              }
+              onClick={() => goToMode("execution")}
+              className={`mt-1 flex w-full items-center justify-start rounded-xl px-3 py-2 text-sm font-medium ${
+                currentMode === "execution"
+                  ? "bg-[hsl(var(--slate))]/15 text-[hsl(var(--slate))]"
+                  : "text-muted-foreground transition-colors hover:bg-accent/80 hover:text-foreground"
+              }`}
             >
               <Sparkles className="mr-1.5 inline h-3.5 w-3.5" />
               Execution
             </button>
             <button
-              className="mt-1 flex w-full items-center justify-start rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent/80 hover:text-foreground"
-              onClick={() => window.alert("Travel mode is coming soon.")}
+              onClick={() => goToMode("travel")}
+              className={`mt-1 flex w-full items-center justify-start rounded-xl px-3 py-2 text-sm font-medium ${
+                currentMode === "travel"
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground transition-colors hover:bg-accent/80 hover:text-foreground"
+              }`}
             >
               <Plane className="mr-1.5 inline h-3.5 w-3.5" />
-              Travel (Coming Soon)
+              Travel
+            </button>
+            <button
+              onClick={() => goToMode("momento")}
+              className={`mt-1 flex w-full items-center justify-start rounded-xl px-3 py-2 text-sm font-medium ${
+                currentMode === "momento"
+                  ? "bg-[hsl(var(--plum))]/15 text-[hsl(var(--plum))]"
+                  : "text-muted-foreground transition-colors hover:bg-accent/80 hover:text-foreground"
+              }`}
+            >
+              <Compass className="mr-1.5 inline h-3.5 w-3.5" />
+              Momento
             </button>
           </div>
         </div>
