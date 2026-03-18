@@ -14,16 +14,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   if (status === "loading") {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="paper-texture flex min-h-screen bg-background">
       <AppSidebar />
-      <main className="flex-1 overflow-auto">{children}</main>
+      <main className="relative flex-1 overflow-auto">{children}</main>
     </div>
   );
 }

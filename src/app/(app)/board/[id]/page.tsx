@@ -12,6 +12,7 @@ import { BoardSettingsSheet } from "@/components/boards/board-settings-sheet";
 import {
   ArrowLeft,
   BookOpen,
+  Camera,
   Cloud,
   Compass,
   List,
@@ -131,20 +132,24 @@ export default function BoardPage() {
 
   return (
     <div className="flex h-screen flex-col bg-background paper-texture">
-      <div className="flex items-center justify-between border-b bg-background/85 px-4 py-3 backdrop-blur-sm">
+      <div className="flex items-center justify-between border-b border-border bg-background/90 px-4 py-3 backdrop-blur-sm">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => router.push("/dashboard")}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Plan Card</p>
             <h1 className="font-display text-3xl leading-none text-foreground">{board.name}</h1>
             <p className="mt-1 text-xs text-muted-foreground">
               {board.description || "Collaborative trip planning"}
             </p>
           </div>
-          <Badge variant="secondary" className="ml-2">
+          <Badge variant="secondary" className="ml-2 bg-primary/12 text-primary">
             <Users className="mr-1 h-3 w-3" />
             {board.members.length}
+          </Badge>
+          <Badge variant="outline" className="hidden border-border bg-card/70 text-xs text-muted-foreground sm:inline-flex">
+            Mode: {board.boardMode}
           </Badge>
         </div>
 
@@ -157,7 +162,7 @@ export default function BoardPage() {
       </div>
 
       <div className="flex justify-center border-b border-border px-4 py-3">
-        <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1">
+        <div className="flex items-center gap-1 rounded-full border border-border bg-card/90 p-1 shadow-sm">
           {(Object.keys(modeMeta) as ViewMode[]).map((mode) => {
             const Icon = modeMeta[mode].icon;
             const active = viewMode === mode;
@@ -191,7 +196,7 @@ export default function BoardPage() {
             </div>
 
             {showPinList && (
-              <div className="w-96 border-l bg-white">
+              <div className="w-96 border-l border-border bg-card/85 backdrop-blur">
                 <PinList
                   boardId={board.id}
                   pins={board.pins}
@@ -288,21 +293,81 @@ export default function BoardPage() {
               <Badge className="bg-[hsl(var(--plum))]/15 text-[hsl(var(--plum))]">Concept</Badge>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-              {momentoPins.map((pin, i) => (
-                <div
-                  key={pin.id}
-                  className={`relative overflow-hidden rounded-xl border border-border bg-gradient-to-br p-4 ${
-                    i % 2 === 0 ? "from-[#d9c9b5] to-[#cbb297]" : "from-[#c5d1de] to-[#a7b6c8]"
-                  } ${i % 3 === 0 ? "md:row-span-2 min-h-[220px]" : "min-h-[140px]"}`}
-                >
-                  <p className="text-xs uppercase tracking-wide text-foreground/60">memory</p>
-                  <p className="mt-2 font-display text-2xl leading-none text-foreground">{pin.name}</p>
-                  <p className="mt-1 text-xs text-foreground/70">{pin.notes || "Add notes and photos to generate journal pages."}</p>
-                  <MapPin className="absolute bottom-3 right-3 h-4 w-4 text-foreground/50" />
-                </div>
-              ))}
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card/80 p-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">AI Journal Draft</p>
+                <p className="font-display text-2xl leading-none text-foreground">From Pins to Memories</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Upload photos, add quick notes, and generate scrapbook pages per place.
+                </p>
+              </div>
+              <Button variant="outline" size="sm">
+                <Camera className="mr-1.5 h-4 w-4" />
+                Upload Media
+              </Button>
             </div>
+
+            {momentoPins.length === 0 ? (
+              <div className="rounded-2xl border-2 border-dashed border-border py-16 text-center">
+                <p className="font-display text-3xl text-foreground">No memories yet</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Add places in Dream mode now, then return here to build your journal.
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                {momentoPins.map((pin, i) => (
+                  <article
+                    key={pin.id}
+                    className={`relative rounded-2xl border border-border bg-card p-3 shadow-sm ${
+                      i % 4 === 0
+                        ? "-rotate-1"
+                        : i % 4 === 1
+                          ? "rotate-1"
+                          : i % 4 === 2
+                            ? "rotate-[0.5deg]"
+                            : "-rotate-[0.5deg]"
+                    }`}
+                  >
+                    <span
+                      className={`absolute -top-2 left-6 h-4 w-16 rounded-sm ${
+                        i % 3 === 0
+                          ? "bg-[#dcc89f]/75"
+                          : i % 3 === 1
+                            ? "bg-[#c9d6e1]/75"
+                            : "bg-[#d9b9ad]/75"
+                      }`}
+                    />
+
+                    <div
+                      className={`relative min-h-[170px] overflow-hidden rounded-xl border border-border ${
+                        i % 2 === 0
+                          ? "bg-gradient-to-br from-[#dfcfba] via-[#d5c1a8] to-[#c8b297]"
+                          : "bg-gradient-to-br from-[#c7d3df] via-[#b7c7d8] to-[#9fb1c5]"
+                      }`}
+                    >
+                      <div className="absolute inset-0 opacity-20 [background:radial-gradient(circle_at_20%_15%,#ffffff,transparent_40%),radial-gradient(circle_at_80%_85%,#fff4de,transparent_45%)]" />
+                      <div className="relative flex h-full flex-col justify-between p-4">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-[0.16em] text-foreground/70">
+                            {pin.city || "Travel"} {pin.country ? `· ${pin.country}` : ""}
+                          </p>
+                          <p className="mt-1 font-display text-3xl leading-none text-foreground">{pin.name}</p>
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-foreground/70">
+                          <span>Journal Draft</span>
+                          <MapPin className="h-4 w-4" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className="mt-3 line-clamp-3 text-sm italic text-muted-foreground">
+                      {pin.notes ? `"${pin.notes}"` : "Add your voice note or caption here, and AI will turn it into a journal story block."}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

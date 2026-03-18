@@ -60,27 +60,34 @@ export function AppSidebar() {
 
   return (
     <aside
-      className={`flex flex-col border-r border-gray-200 bg-white transition-all duration-200 ${
-        collapsed ? "w-16" : "w-64"
+      className={`paper-texture relative flex flex-col border-r border-border/80 bg-card/90 backdrop-blur transition-all duration-200 ${
+        collapsed ? "w-16" : "w-72"
       }`}
     >
       {/* Logo */}
-      <div className="flex h-16 items-center justify-between border-b px-4">
+      <div className="flex h-16 items-center justify-between border-b border-border/70 px-4">
         {!collapsed && (
           <Link href="/dashboard" className="flex items-center gap-2">
-            <Compass className="h-6 w-6 text-indigo-600" />
-            <span className="text-lg font-bold text-gray-900">Itergo</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/15">
+              <Compass className="h-5 w-5 text-primary" />
+            </span>
+            <div>
+              <span className="font-display text-2xl leading-none text-foreground">itergo</span>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                journey weave
+              </p>
+            </div>
           </Link>
         )}
         {collapsed && (
-          <Link href="/dashboard" className="mx-auto">
-            <Compass className="h-6 w-6 text-indigo-600" />
+          <Link href="/dashboard" className="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-primary/15">
+            <Compass className="h-5 w-5 text-primary" />
           </Link>
         )}
         <Button
           variant="ghost"
           size="icon"
-          className={`h-8 w-8 ${collapsed ? "hidden" : ""}`}
+          className={`h-8 w-8 rounded-full text-muted-foreground hover:bg-accent ${collapsed ? "hidden" : ""}`}
           onClick={() => setCollapsed(!collapsed)}
         >
           <ChevronLeft className="h-4 w-4" />
@@ -89,18 +96,26 @@ export function AppSidebar() {
 
       {/* Mode Toggle */}
       {!collapsed && (
-        <div className="border-b px-3 py-3">
-          <div className="space-y-1 rounded-lg bg-gray-100 p-1">
-            <button className="flex w-full items-center justify-center rounded-md bg-white px-3 py-1.5 text-sm font-medium text-gray-900 shadow-sm">
+        <div className="border-b border-border/70 px-3 py-3">
+          <div className="rounded-2xl border border-border bg-background/75 p-2">
+            <p className="mb-2 px-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+              Board Mode
+            </p>
+            <button className="flex w-full items-center justify-start rounded-xl bg-primary/10 px-3 py-2 text-sm font-medium text-primary">
               <Cloud className="mr-1.5 inline h-3.5 w-3.5" />
               Dream
             </button>
-            <button className="flex w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-800">
+            <button
+              className="mt-1 flex w-full items-center justify-start rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent/80 hover:text-foreground"
+              onClick={() =>
+                window.alert("Execution mode is managed per plan card from dashboard and board views.")
+              }
+            >
               <Sparkles className="mr-1.5 inline h-3.5 w-3.5" />
               Execution
             </button>
             <button
-              className="flex w-full items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium text-gray-500 hover:text-gray-700"
+              className="mt-1 flex w-full items-center justify-start rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent/80 hover:text-foreground"
               onClick={() => window.alert("Travel mode is coming soon.")}
             >
               <Plane className="mr-1.5 inline h-3.5 w-3.5" />
@@ -121,10 +136,10 @@ export function AppSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-indigo-50 text-indigo-700"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  ? "bg-primary/12 text-primary"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
               } ${collapsed ? "justify-center" : ""}`}
               title={collapsed ? item.label : undefined}
             >
@@ -141,7 +156,7 @@ export function AppSidebar() {
           <Button
             variant="ghost"
             size="icon"
-            className="mx-auto flex h-8 w-8"
+            className="mx-auto flex h-8 w-8 rounded-full text-muted-foreground hover:bg-accent"
             onClick={() => setCollapsed(false)}
           >
             <ChevronRight className="h-4 w-4" />
@@ -150,29 +165,29 @@ export function AppSidebar() {
       )}
 
       {/* User menu */}
-      <div className="border-t px-3 py-3">
+      <div className="border-t border-border/70 px-3 py-3">
         <DropdownMenu>
           <DropdownMenuTrigger
-            className={`flex w-full items-center gap-3 rounded-lg px-2 py-2 hover:bg-gray-100 ${
+            className={`flex w-full items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-accent ${
               collapsed ? "justify-center" : ""
             }`}
           >
             <Avatar className="h-8 w-8">
               <AvatarImage src={user?.image ?? undefined} />
-              <AvatarFallback className="bg-indigo-100 text-xs text-indigo-700">
+              <AvatarFallback className="bg-primary/15 text-xs text-primary">
                 {initials}
               </AvatarFallback>
             </Avatar>
             {!collapsed && (
               <div className="flex-1 text-left">
-                <p className="truncate text-sm font-medium text-gray-900">
+                <p className="truncate text-sm font-medium text-foreground">
                   {user?.name}
                 </p>
-                <p className="truncate text-xs text-gray-500">{user?.email}</p>
+                <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
               </div>
             )}
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuContent align="end" className="w-56 border-border bg-popover">
             <DropdownMenuItem onClick={() => (window.location.href = "/settings")}>
               <Settings className="mr-2 h-4 w-4" />
               Settings
