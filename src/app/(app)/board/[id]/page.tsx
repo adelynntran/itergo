@@ -12,15 +12,21 @@ import { BoardSettingsSheet } from "@/components/boards/board-settings-sheet";
 import {
   ArrowLeft,
   BookOpen,
+  Calendar,
   Camera,
+  Check,
+  ChevronRight,
   Cloud,
   Compass,
+  DollarSign,
+  GripVertical,
   List,
   Map as MapIcon,
   MapPin,
   Navigation,
   Settings,
   Sparkles,
+  Clock,
   Users,
 } from "lucide-react";
 
@@ -32,6 +38,15 @@ type BoardPin = {
   country: string | null;
   address: string | null;
   notes: string | null;
+};
+type TravelTab = "today" | "budget";
+type ExpenseEntry = {
+  id: string;
+  description: string;
+  amount: number;
+  paidBy: string;
+  splitAmong: string[];
+  currency: string;
 };
 
 const modeMeta: Record<ViewMode, { label: string; icon: React.ElementType; activeClass: string }> = {
@@ -65,6 +80,7 @@ export default function BoardPage() {
   const [showSettings, setShowSettings] = useState(false);
   const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("dream");
+  const [travelTab, setTravelTab] = useState<TravelTab>("today");
 
   const { data: board, isLoading } = useBoardDetail(id);
   const updateBoardMode = useUpdateBoardMode();
@@ -108,6 +124,41 @@ export default function BoardPage() {
     () => (board.pins as BoardPin[]).slice(0, 8),
     [board.pins]
   );
+  const memberNames = useMemo<string[]>(() => {
+    const names = (board.members ?? [])
+      .map((member: any) => member.user?.name?.trim())
+      .filter((name: string | undefined): name is string => Boolean(name));
+    return names.length > 0 ? names : ["You"];
+  }, [board.members]);
+  const mockExpenses = useMemo<ExpenseEntry[]>(() => {
+    if (dayStops.length === 0) return [];
+    return dayStops.slice(0, 4).map((pin, i) => {
+      const paidBy = memberNames[i % memberNames.length] ?? "You";
+      const splitAmong = i % 2 === 0 ? memberNames : memberNames.slice(0, Math.min(2, memberNames.length));
+      return {
+        id: pin.id,
+        description: pin.name,
+        amount: 18 + i * 12,
+        paidBy,
+        splitAmong: splitAmong.length > 0 ? splitAmong : [paidBy],
+        currency: "$",
+      };
+    });
+  }, [dayStops, memberNames]);
+  const balances = useMemo(() => {
+    const next: Record<string, number> = {};
+    memberNames.forEach((name) => {
+      next[name] = 0;
+    });
+    mockExpenses.forEach((exp) => {
+      const splitAmount = exp.amount / Math.max(1, exp.splitAmong.length);
+      next[exp.paidBy] += exp.amount;
+      exp.splitAmong.forEach((name) => {
+        next[name] -= splitAmount;
+      });
+    });
+    return next;
+  }, [memberNames, mockExpenses]);
 
   const changeMode = (nextMode: ViewMode) => {
     if (nextMode === "execution") {
@@ -128,6 +179,12 @@ export default function BoardPage() {
     }
 
     setViewMode(nextMode);
+  };
+  const openPinDirections = (pin: BoardPin) => {
+    const query = [pin.name, pin.address, pin.city, pin.country].filter(Boolean).join(", ");
+    if (!query) return;
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -226,60 +283,218 @@ export default function BoardPage() {
         )}
 
         {viewMode === "execution" && (
-          <div className="h-full overflow-y-auto p-6">
-            <div className="mb-6 flex items-start gap-4 rounded-xl border border-[hsl(var(--slate))]/20 bg-[hsl(var(--slate))]/5 p-4">
-              <Sparkles className="mt-0.5 h-5 w-5 text-[hsl(var(--slate))]" />
-              <div>
-                <p className="text-sm text-foreground">AI can help build your itinerary from Dream pins.</p>
-                <p className="text-xs text-muted-foreground">Best dates by weather and budget, plus day-by-day route suggestions.</p>
+          <div className="flex h-full flex-col lg:flex-row">
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="mb-6 flex items-start gap-4 rounded-xl border border-[hsl(var(--slate))]/20 bg-[hsl(var(--slate))]/5 p-4">
+                <Sparkles className="mt-0.5 h-5 w-5 text-[hsl(var(--slate))]" />
+                <div>
+                  <p className="text-sm text-foreground">AI can help build your itinerary from Dream pins.</p>
+                  <p className="text-xs text-muted-foreground">Best dates by weather and budget, plus day-by-day route suggestions.</p>
+                </div>
               </div>
+
+              <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+                <div className="rounded-xl border border-border bg-card p-3">
+                  <Calendar className="h-4 w-4 text-[hsl(var(--slate))]" />
+                  <p className="mt-1 text-xs text-muted-foreground">Dates</p>
+                  <p className="font-display text-lg leading-none text-foreground">
+                    {board.executionStartedAt
+                      ? new Date(board.executionStartedAt).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                        })
+                      : "Flexible"}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-border bg-card p-3">
+                  <Clock className="h-4 w-4 text-[hsl(var(--slate))]" />
+                  <p className="mt-1 text-xs text-muted-foreground">Duration</p>
+                  <p className="font-display text-lg leading-none text-foreground">
+                    {Math.max(1, Math.ceil(dayStops.length / 3))} days
+                  </p>
+                </div>
+                <div className="rounded-xl border border-border bg-card p-3">
+                  <Users className="h-4 w-4 text-[hsl(var(--slate))]" />
+                  <p className="mt-1 text-xs text-muted-foreground">Travelers</p>
+                  <p className="font-display text-lg leading-none text-foreground">{memberNames.length}</p>
+                </div>
+                <div className="rounded-xl border border-border bg-card p-3">
+                  <DollarSign className="h-4 w-4 text-[hsl(var(--slate))]" />
+                  <p className="mt-1 text-xs text-muted-foreground">Budget</p>
+                  <p className="font-display text-lg leading-none text-foreground">
+                    ${mockExpenses.reduce((sum, item) => sum + item.amount, 0)}
+                  </p>
+                </div>
+              </div>
+
+              <h2 className="font-display text-3xl text-foreground">Itinerary</h2>
+              <p className="mb-4 text-sm text-muted-foreground">Drag to reorder · Click to edit details</p>
+
+              {dayStops.length === 0 ? (
+                <div className="rounded-xl border-2 border-dashed border-border py-12 text-center">
+                  <p className="font-display text-2xl text-foreground">No stops yet</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Add places in Dream mode, then move your plan card into execution.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {dayStops.map((pin, i) => (
+                    <div key={pin.id} className="timeline-connector pl-6">
+                      <div className="absolute left-0 top-5 flex h-4 w-4 items-center justify-center rounded-full border-2 border-[hsl(var(--slate))]/30 bg-background">
+                        <Check className="h-2.5 w-2.5 text-[hsl(var(--sage))]" />
+                      </div>
+                      <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-4">
+                        <GripVertical className="mt-1 h-4 w-4 text-muted-foreground/40" />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span>{String(8 + i * 2).padStart(2, "0")}:00</span>
+                            <span>·</span>
+                            <span>{i === dayStops.length - 1 ? "2h" : "1.5h"}</span>
+                          </div>
+                          <p className="mt-1 font-display text-2xl leading-none text-foreground">{pin.name}</p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {[pin.city, pin.country].filter(Boolean).join(", ") || pin.address || "Location"}
+                          </p>
+                          {pin.notes && <p className="mt-2 text-xs italic text-muted-foreground">{pin.notes}</p>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            <h2 className="font-display text-3xl text-foreground">Execution Plan</h2>
-            <p className="mb-4 text-sm text-muted-foreground">Day 1 draft itinerary from selected pins</p>
-
-            <div className="space-y-3">
-              {dayStops.map((pin, i) => (
-                <div key={pin.id} className="rounded-xl border border-border bg-card p-4">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>{String(8 + i * 2).padStart(2, "0")}:00</span>
-                    <span>·</span>
-                    <span>{i === dayStops.length - 1 ? "2h" : "1.5h"}</span>
-                  </div>
-                  <p className="mt-1 font-display text-2xl leading-none text-foreground">{pin.name}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">{[pin.city, pin.country].filter(Boolean).join(", ") || pin.address || "Location"}</p>
+            <div className="hidden items-center justify-center border-l border-border bg-[hsl(var(--slate))]/6 lg:flex lg:w-[420px] xl:w-[500px]">
+              <div className="p-8 text-center">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-border bg-card">
+                  <MapPin className="h-7 w-7 text-[hsl(var(--slate))]" />
                 </div>
-              ))}
+                <p className="font-display text-2xl leading-none text-foreground">Route Map</p>
+                <p className="mt-2 max-w-xs text-sm text-muted-foreground">
+                  Your day-by-day route will be plotted here with travel times between stops.
+                </p>
+              </div>
             </div>
           </div>
         )}
 
         {viewMode === "travel" && (
-          <div className="mx-auto h-full max-w-2xl overflow-y-auto p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h2 className="font-display text-3xl text-foreground">Travel Day</h2>
-                <p className="text-sm text-muted-foreground">Ready-to-go route checklist</p>
+          <div className="h-full overflow-y-auto">
+            <div className="sticky top-0 z-10 border-b border-border bg-background/90 backdrop-blur-sm">
+              <div className="flex gap-1 px-6 pt-3">
+                <button
+                  onClick={() => setTravelTab("today")}
+                  className={`rounded-t-lg px-4 py-2.5 text-sm transition-colors ${
+                    travelTab === "today"
+                      ? "border border-b-0 border-border bg-card text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Today&apos;s Plan
+                </button>
+                <button
+                  onClick={() => setTravelTab("budget")}
+                  className={`rounded-t-lg px-4 py-2.5 text-sm transition-colors ${
+                    travelTab === "budget"
+                      ? "border border-b-0 border-border bg-card text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Budget
+                </button>
+                <div className="ml-auto py-2">
+                  <Badge className="bg-primary/15 text-primary">Coming Soon</Badge>
+                </div>
               </div>
-              <Badge className="bg-primary/15 text-primary">Coming Soon</Badge>
             </div>
 
-            <div className="space-y-3">
-              {dayStops.map((pin, i) => (
-                <div key={pin.id} className="flex items-center gap-3 rounded-xl border border-border bg-card p-4">
-                  <div className="w-10 rounded-full bg-primary/10 px-2 py-1 text-center text-sm text-primary">
-                    {String(8 + i * 2).padStart(2, "0")}:00
+            {travelTab === "today" ? (
+              <div className="mx-auto max-w-2xl p-6">
+                <div className="mb-6">
+                  <h2 className="font-display text-3xl text-foreground">Day 1</h2>
+                  <p className="text-sm text-muted-foreground">{dayStops.length} stops planned</p>
+                </div>
+
+                <div className="space-y-3">
+                  {dayStops.map((pin, i) => (
+                    <div key={pin.id} className="flex items-center gap-3 rounded-xl border border-border bg-card p-4">
+                      <div className="w-10 rounded-full bg-primary/10 px-2 py-1 text-center text-sm text-primary">
+                        {String(8 + i * 2).padStart(2, "0")}:00
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-display text-2xl leading-none text-foreground">{pin.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {[pin.city, pin.country].filter(Boolean).join(", ") || pin.address || "Location"}
+                        </p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        title="Open in Google Maps"
+                        onClick={() => openPinDirections(pin)}
+                      >
+                        <Navigation className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+
+                <Button
+                  className="mt-6 w-full"
+                  onClick={() => window.alert("Expense logging form is coming soon.")}
+                >
+                  <DollarSign className="mr-1.5 h-4 w-4" />
+                  Quick Log Expense
+                </Button>
+              </div>
+            ) : (
+              <div className="mx-auto max-w-2xl p-6">
+                <div className="mb-6 flex items-center justify-between">
+                  <div>
+                    <h2 className="font-display text-3xl text-foreground">Budget</h2>
+                    <p className="text-sm text-muted-foreground">
+                      Total: ${mockExpenses.reduce((sum, item) => sum + item.amount, 0)}
+                    </p>
                   </div>
-                  <div className="flex-1">
-                    <p className="font-display text-2xl leading-none text-foreground">{pin.name}</p>
-                    <p className="text-xs text-muted-foreground">{[pin.city, pin.country].filter(Boolean).join(", ") || pin.address || "Location"}</p>
-                  </div>
-                  <Button variant="outline" size="icon" title="Open in maps">
-                    <Navigation className="h-4 w-4" />
+                  <Button size="sm" onClick={() => window.alert("Add expense is coming soon.")}>
+                    Add
                   </Button>
                 </div>
-              ))}
-            </div>
+
+                <div className="mb-6 rounded-xl border border-border bg-card p-4">
+                  <h3 className="font-display text-lg leading-none text-foreground">Who owes whom</h3>
+                  <div className="mt-3 space-y-2">
+                    {Object.entries(balances).map(([name, amount]) => (
+                      <div key={name} className="flex items-center justify-between text-sm">
+                        <span className="text-foreground">{name}</span>
+                        <span className={amount >= 0 ? "text-[hsl(var(--sage))]" : "text-primary"}>
+                          {amount >= 0 ? "+" : "-"}${Math.abs(amount).toFixed(2)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  {mockExpenses.map((expense) => (
+                    <div key={expense.id} className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
+                      <div className="flex-1">
+                        <p className="text-sm text-foreground">{expense.description}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Paid by {expense.paidBy} · Split {expense.splitAmong.length} ways
+                        </p>
+                      </div>
+                      <span className="text-sm text-foreground">
+                        {expense.currency}
+                        {expense.amount}
+                      </span>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

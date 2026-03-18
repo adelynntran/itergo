@@ -98,6 +98,16 @@ export default function LoginPage() {
               </div>
             </div>
 
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                <input type="checkbox" className="h-4 w-4 rounded border-border accent-primary" />
+                Remember me
+              </label>
+              <button type="button" className="text-xs text-primary hover:underline">
+                Forgot password?
+              </button>
+            </div>
+
             <Button type="submit" className="h-11 w-full" disabled={loading}>
               {loading ? "Signing in..." : "Sign In"}
             </Button>
@@ -112,13 +122,22 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <Button
-            variant="outline"
-            className="h-11 w-full"
-            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-          >
-            Continue with Google
-          </Button>
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant="outline"
+              className="h-11"
+              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+            >
+              Google
+            </Button>
+            <Button
+              variant="outline"
+              className="h-11"
+              onClick={() => window.alert("Apple sign in is coming soon.")}
+            >
+              Apple
+            </Button>
+          </div>
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}

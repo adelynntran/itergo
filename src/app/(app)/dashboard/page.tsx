@@ -91,11 +91,11 @@ export default function DashboardPage() {
 
   return (
     <div className="paper-texture min-h-full bg-background">
-      <div className="border-b border-border bg-background/80 px-6 py-4 backdrop-blur-sm lg:px-8">
-        <div className="flex items-center justify-between gap-3">
-          <div>
+      <div className="sticky top-0 z-20 border-b border-border bg-background/85 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-6 py-4">
+          <div className="space-y-0.5">
             <h1 className="font-display text-3xl tracking-wide text-foreground">itergo</h1>
-            <p className="text-xs text-muted-foreground">Your plan cards</p>
+            <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Your plan cards</p>
           </div>
           <Link href="/locations-bin">
             <Button variant="outline" size="sm">
@@ -106,7 +106,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="p-6 lg:p-8">
+      <div className="animate-page-fade mx-auto max-w-6xl p-6 lg:p-8">
         <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="font-display text-3xl text-foreground">Your Trips</h2>

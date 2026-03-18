@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 
@@ -13,7 +12,6 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,7 +121,7 @@ export default function SignupPage() {
               </div>
             </div>
 
-            <Button type="submit" className="h-11 w-full" disabled={loading}>
+          <Button type="submit" className="h-11 w-full" disabled={loading}>
               {loading ? "Creating account..." : "Create Account"}
             </Button>
           </form>
@@ -137,13 +135,22 @@ export default function SignupPage() {
             </div>
           </div>
 
-          <Button
-            variant="outline"
-            className="h-11 w-full"
-            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-          >
-            Continue with Google
-          </Button>
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant="outline"
+              className="h-11"
+              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+            >
+              Google
+            </Button>
+            <Button
+              variant="outline"
+              className="h-11"
+              onClick={() => window.alert("Apple sign up is coming soon.")}
+            >
+              Apple
+            </Button>
+          </div>
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
             Already have an account?{" "}
@@ -152,13 +159,9 @@ export default function SignupPage() {
             </Link>
           </p>
 
-          <button
-            type="button"
-            className="mt-4 w-full text-center text-xs text-muted-foreground hover:underline"
-            onClick={() => router.push("/login")}
-          >
+          <p className="mt-4 text-center text-xs text-muted-foreground">
             By signing up, you agree to our terms.
-          </button>
+          </p>
         </div>
       </div>
     </div>

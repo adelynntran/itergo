@@ -56,7 +56,7 @@ export function BoardCard({ board, selectMode, isSelected, onToggleSelect }: Boa
 
   const content = (
     <Card
-      className={`overflow-hidden border border-border bg-card p-0 text-left transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
+      className={`group overflow-hidden border border-border bg-card p-0 text-left transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${
         isSelected ? "ring-2 ring-primary" : ""
       }`}
     >
@@ -101,7 +101,9 @@ export function BoardCard({ board, selectMode, isSelected, onToggleSelect }: Boa
 
       <CardContent className="space-y-3 px-4 py-4">
         <div>
-          <h3 className="font-display text-xl leading-none text-foreground">{board.name}</h3>
+          <h3 className="font-display text-lg leading-none text-foreground transition-colors group-hover:text-primary">
+            {board.name}
+          </h3>
           {board.description && (
             <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{board.description}</p>
           )}
