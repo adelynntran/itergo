@@ -5,6 +5,7 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "@/server/db";
 import { users } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
+import { compare, hash } from "bcryptjs";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db),
@@ -27,15 +28,36 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
+        const normalizedEmail = String(credentials.email).trim().toLowerCase();
+        const rawPassword = String(credentials.password);
+
         const user = await db.query.users.findFirst({
-          where: eq(users.email, credentials.email as string),
+          where: eq(users.email, normalizedEmail),
         });
 
         if (!user || !user.passwordHash) return null;
 
-        // TODO: Add bcrypt password comparison
-        // const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
-        // if (!isValid) return null;
+        const isBcryptHash =
+          user.passwordHash.startsWith("$2a$") ||
+          user.passwordHash.startsWith("$2b$") ||
+          user.passwordHash.startsWith("$2y$");
+
+        let isValid = false;
+        if (isBcryptHash) {
+          isValid = await compare(rawPassword, user.passwordHash);
+        } else {
+          // Backward compatibility: old users stored as plain text.
+          isValid = rawPassword === user.passwordHash;
+          if (isValid) {
+            const upgradedHash = await hash(rawPassword, 12);
+            await db
+              .update(users)
+              .set({ passwordHash: upgradedHash, updatedAt: new Date() })
+              .where(eq(users.id, user.id));
+          }
+        }
+
+        if (!isValid) return null;
 
         return {
           id: user.id,

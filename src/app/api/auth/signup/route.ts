@@ -2,19 +2,23 @@ import { NextResponse } from "next/server";
 import { db } from "@/server/db";
 import { users } from "@/server/db/schema";
 import { eq } from "drizzle-orm";
+import { hash } from "bcryptjs";
 
 export async function POST(request: Request) {
   try {
     const { name, email, password } = await request.json();
+    const normalizedName = String(name ?? "").trim();
+    const normalizedEmail = String(email ?? "").trim().toLowerCase();
+    const rawPassword = String(password ?? "");
 
-    if (!name || !email || !password) {
+    if (!normalizedName || !normalizedEmail || !rawPassword) {
       return NextResponse.json(
         { error: "Name, email, and password are required" },
         { status: 400 }
       );
     }
 
-    if (password.length < 8) {
+    if (rawPassword.length < 8) {
       return NextResponse.json(
         { error: "Password must be at least 8 characters" },
         { status: 400 }
@@ -23,7 +27,7 @@ export async function POST(request: Request) {
 
     // Check if user already exists
     const existing = await db.query.users.findFirst({
-      where: eq(users.email, email),
+      where: eq(users.email, normalizedEmail),
     });
 
     if (existing) {
@@ -33,15 +37,13 @@ export async function POST(request: Request) {
       );
     }
 
-    // TODO: Hash password with bcrypt
-    // const passwordHash = await bcrypt.hash(password, 12);
-    const passwordHash = password; // Temporary: plain text until bcrypt is added
+    const passwordHash = await hash(rawPassword, 12);
 
     const [user] = await db
       .insert(users)
       .values({
-        email,
-        displayName: name,
+        email: normalizedEmail,
+        displayName: normalizedName,
         passwordHash,
       })
       .returning({ id: users.id, email: users.email });
