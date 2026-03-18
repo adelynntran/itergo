@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useCreatePin } from "@/lib/api/hooks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,7 +68,7 @@ export function AddPinSidebar({
   };
 
   const searchPlaces = useCallback(
-    async (q: string) => {
+    async (q: string, signal?: AbortSignal) => {
       if (!q.trim() || q.length < 3) {
         setResults([]);
         return;
@@ -79,14 +79,40 @@ export function AddPinSidebar({
 
       setSearching(true);
       try {
-        const res = await fetch(
+        const primaryRes = await fetch(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
             q
-          )}.json?access_token=${token}&types=poi,place,address,locality&limit=5`
+          )}.json?access_token=${token}&types=poi,place&autocomplete=true&fuzzyMatch=true&language=en&limit=5`,
+          { signal }
         );
-        const data = await res.json();
-        setResults(data.features ?? []);
-      } catch {
+        const primaryData = await primaryRes.json();
+        const primaryFeatures: SearchResult[] = primaryData.features ?? [];
+
+        if (primaryFeatures.length >= 5) {
+          setResults(primaryFeatures.slice(0, 5));
+          return;
+        }
+
+        // Fallback fills remaining slots with address/locality matches.
+        const fallbackRes = await fetch(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+            q
+          )}.json?access_token=${token}&types=address,locality,neighborhood&autocomplete=true&fuzzyMatch=true&language=en&limit=5`,
+          { signal }
+        );
+        const fallbackData = await fallbackRes.json();
+        const fallbackFeatures: SearchResult[] = fallbackData.features ?? [];
+
+        const deduped = [...primaryFeatures];
+        for (const feature of fallbackFeatures) {
+          if (!deduped.some((f) => f.id === feature.id)) {
+            deduped.push(feature);
+          }
+        }
+
+        setResults(deduped.slice(0, 5));
+      } catch (error) {
+        if ((error as { name?: string })?.name === "AbortError") return;
         setResults([]);
       } finally {
         setSearching(false);
@@ -95,11 +121,27 @@ export function AddPinSidebar({
     []
   );
 
+  useEffect(() => {
+    const trimmed = query.trim();
+    if (!trimmed || trimmed.length < 3) {
+      setResults([]);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      void searchPlaces(trimmed, controller.signal);
+    }, 350);
+
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
+  }, [query, searchPlaces]);
+
   const handleSearchChange = (value: string) => {
     setQuery(value);
     setSelectedPlace(null);
-    const timer = setTimeout(() => searchPlaces(value), 400);
-    return () => clearTimeout(timer);
   };
 
   const selectPlace = (result: SearchResult) => {
