@@ -94,42 +94,31 @@ export default function BoardPage() {
     }
   }, [board]);
 
-  if (isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
-    );
-  }
-
-  if (!board) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center gap-4">
-        <p className="text-gray-500">Board not found</p>
-        <Button variant="outline" onClick={() => router.push("/dashboard")}>
-          Back to Dashboard
-        </Button>
-      </div>
-    );
-  }
-
-  const userRole = board.currentUserRole;
+  const boardPins = useMemo<BoardPin[]>(
+    () => ((board?.pins ?? []) as BoardPin[]),
+    [board?.pins]
+  );
+  const boardMembers = useMemo<any[]>(
+    () => ((board?.members ?? []) as any[]),
+    [board?.members]
+  );
+  const userRole = board?.currentUserRole;
   const canEdit = userRole === "host" || userRole === "editor";
 
   const dayStops = useMemo<BoardPin[]>(
-    () => (board.pins as BoardPin[]).slice(0, 6),
-    [board.pins]
+    () => boardPins.slice(0, 6),
+    [boardPins]
   );
   const momentoPins = useMemo<BoardPin[]>(
-    () => (board.pins as BoardPin[]).slice(0, 8),
-    [board.pins]
+    () => boardPins.slice(0, 8),
+    [boardPins]
   );
   const memberNames = useMemo<string[]>(() => {
-    const names = (board.members ?? [])
+    const names = boardMembers
       .map((member: any) => member.user?.name?.trim())
       .filter((name: string | undefined): name is string => Boolean(name));
     return names.length > 0 ? names : ["You"];
-  }, [board.members]);
+  }, [boardMembers]);
   const mockExpenses = useMemo<ExpenseEntry[]>(() => {
     if (dayStops.length === 0) return [];
     return dayStops.slice(0, 4).map((pin, i) => {
@@ -159,6 +148,25 @@ export default function BoardPage() {
     });
     return next;
   }, [memberNames, mockExpenses]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (!board) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-4">
+        <p className="text-gray-500">Board not found</p>
+        <Button variant="outline" onClick={() => router.push("/dashboard")}>
+          Back to Dashboard
+        </Button>
+      </div>
+    );
+  }
 
   const changeMode = (nextMode: ViewMode) => {
     if (nextMode === "execution") {
