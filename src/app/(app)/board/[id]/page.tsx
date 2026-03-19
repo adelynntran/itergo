@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useBoardDetail, useUpdateBoardMode } from "@/lib/api/hooks";
+import { useBoardDetail } from "@/lib/api/hooks";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PinMap } from "@/components/pins/pin-map";
@@ -11,13 +11,10 @@ import { AddPinSidebar } from "@/components/pins/add-pin-sidebar";
 import { BoardSettingsSheet } from "@/components/boards/board-settings-sheet";
 import {
   ArrowLeft,
-  BookOpen,
   Calendar,
   Camera,
   Check,
   ChevronRight,
-  Cloud,
-  Compass,
   DollarSign,
   GripVertical,
   List,
@@ -49,29 +46,6 @@ type ExpenseEntry = {
   currency: string;
 };
 
-const modeMeta: Record<ViewMode, { label: string; icon: React.ElementType; activeClass: string }> = {
-  dream: {
-    label: "Dream",
-    icon: Cloud,
-    activeClass: "bg-[hsl(var(--olive))]/15 text-[hsl(var(--olive))]",
-  },
-  execution: {
-    label: "Execution",
-    icon: MapIcon,
-    activeClass: "bg-[hsl(var(--slate))]/15 text-[hsl(var(--slate))]",
-  },
-  travel: {
-    label: "Travel",
-    icon: Compass,
-    activeClass: "bg-primary/15 text-primary",
-  },
-  momento: {
-    label: "Momento",
-    icon: BookOpen,
-    activeClass: "bg-[hsl(var(--plum))]/15 text-[hsl(var(--plum))]",
-  },
-};
-
 export default function BoardPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -79,20 +53,9 @@ export default function BoardPage() {
   const [showAddPin, setShowAddPin] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>("dream");
   const [travelTab, setTravelTab] = useState<TravelTab>("today");
 
   const { data: board, isLoading } = useBoardDetail(id);
-  const updateBoardMode = useUpdateBoardMode();
-
-  useEffect(() => {
-    if (!board) return;
-    if (board.boardMode === "execution" || board.boardMode === "travel") {
-      setViewMode(board.boardMode);
-    } else {
-      setViewMode("dream");
-    }
-  }, [board]);
 
   const boardPins = useMemo<BoardPin[]>(
     () => ((board?.pins ?? []) as BoardPin[]),
@@ -148,6 +111,10 @@ export default function BoardPage() {
     });
     return next;
   }, [memberNames, mockExpenses]);
+  const activeMode: ViewMode =
+    board?.boardMode === "execution" || board?.boardMode === "travel"
+      ? board.boardMode
+      : "dream";
 
   if (isLoading) {
     return (
@@ -168,45 +135,6 @@ export default function BoardPage() {
     );
   }
 
-  const changeMode = (nextMode: ViewMode) => {
-    if (!board) return;
-    if (nextMode === viewMode) return;
-
-    if (nextMode === "momento") {
-      window.alert("Momento mode is coming soon.");
-      return;
-    }
-
-    if (nextMode === "execution") {
-      if (board.boardMode !== "execution" && canEdit) {
-        updateBoardMode.mutate(
-          { boardId: board.id, boardMode: "execution" },
-          { onSuccess: () => setViewMode("execution") }
-        );
-      } else if (board.boardMode !== "execution") {
-        window.alert("Only host/editor can move this plan to execution.");
-      } else {
-        setViewMode("execution");
-      }
-      return;
-    }
-
-    if (nextMode === "travel") {
-      if (board.boardMode === "travel") {
-        setViewMode("travel");
-      } else {
-        window.alert("Travel mode will unlock when this plan is promoted from execution.");
-      }
-      return;
-    }
-
-    if (nextMode === "dream" && board.boardMode !== "dream") {
-      window.alert("This plan has already moved forward and is no longer in Dream mode.");
-      return;
-    }
-
-    setViewMode(nextMode);
-  };
   const openPinDirections = (pin: BoardPin) => {
     const query = [pin.name, pin.address, pin.city, pin.country].filter(Boolean).join(", ");
     if (!query) return;
@@ -245,38 +173,8 @@ export default function BoardPage() {
         </div>
       </div>
 
-      <div className="flex justify-center border-b border-border px-4 py-3">
-        <div className="flex items-center gap-1 rounded-full border border-border bg-card/90 p-1 shadow-sm">
-          {(Object.keys(modeMeta) as ViewMode[]).map((mode) => {
-            const Icon = modeMeta[mode].icon;
-            const active = viewMode === mode;
-            const disabled =
-              (mode === "dream" && board.boardMode !== "dream") ||
-              (mode === "travel" && board.boardMode !== "travel") ||
-              mode === "momento";
-            return (
-              <button
-                key={mode}
-                onClick={() => changeMode(mode)}
-                disabled={disabled && !active}
-                className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm transition-all ${
-                  active
-                    ? `${modeMeta[mode].activeClass} shadow-sm`
-                    : disabled
-                      ? "cursor-not-allowed text-muted-foreground/60"
-                      : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                <span className="hidden sm:inline">{modeMeta[mode].label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
       <div className="flex-1 overflow-hidden">
-        {viewMode === "dream" && (
+        {activeMode === "dream" && (
           <div className="flex h-full overflow-hidden">
             <div className="flex-1">
               <PinMap
@@ -287,7 +185,7 @@ export default function BoardPage() {
             </div>
 
             {showPinList && (
-              <div className="w-96 border-l border-border bg-card/85 backdrop-blur">
+              <div className="h-full w-96 overflow-hidden border-l border-border bg-card/85 backdrop-blur">
                 <PinList
                   boardId={board.id}
                   pins={board.pins}
@@ -316,7 +214,7 @@ export default function BoardPage() {
           </div>
         )}
 
-        {viewMode === "execution" && (
+        {activeMode === "execution" && (
           <div className="flex h-full flex-col lg:flex-row">
             <div className="flex-1 overflow-y-auto p-6">
               <div className="mb-6 flex items-start gap-4 rounded-xl border border-[hsl(var(--slate))]/20 bg-[hsl(var(--slate))]/5 p-4">
@@ -413,7 +311,7 @@ export default function BoardPage() {
           </div>
         )}
 
-        {viewMode === "travel" && (
+        {activeMode === "travel" && (
           <div className="h-full overflow-y-auto">
             <div className="sticky top-0 z-10 border-b border-border bg-background/90 backdrop-blur-sm">
               <div className="flex gap-1 px-6 pt-3">
@@ -532,7 +430,7 @@ export default function BoardPage() {
           </div>
         )}
 
-        {viewMode === "momento" && (
+        {activeMode === "momento" && (
           <div className="h-full overflow-y-auto p-6">
             <div className="mb-5 flex items-center justify-between">
               <div>

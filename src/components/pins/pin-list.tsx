@@ -88,7 +88,7 @@ export function PinList({
   // "recent" is the default order from API
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-h-0 flex-col">
       {/* Search & Filter Header */}
       <div className="space-y-2 border-b p-3">
         <div className="relative">
@@ -136,7 +136,7 @@ export function PinList({
       </div>
 
       {/* Pin List */}
-      <ScrollArea className="flex-1">
+      <ScrollArea className="min-h-0 flex-1">
         <div className="space-y-2 p-3">
           {filtered.length === 0 ? (
             <p className="py-8 text-center text-sm text-gray-500">
