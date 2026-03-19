@@ -18,6 +18,11 @@ interface BoardCardProps {
       id: string;
       name: string;
       category: string | null;
+      media?: Array<{
+        id: string;
+        url: string;
+        thumbnail: string | null;
+      }>;
     }>;
   };
   selectMode?: boolean;
@@ -64,13 +69,24 @@ export function BoardCard({ board, selectMode, isSelected, onToggleSelect }: Boa
         {coverItems.length > 0 ? (
           <div className="grid h-full grid-cols-2 grid-rows-2">
             {coverItems.map((pin, i) => (
-              <div key={pin.id} className={`relative bg-gradient-to-br ${coverGradients[i % coverGradients.length]} p-2`}>
-                <span className="absolute right-2 top-2 text-sm">
-                  {pin.category ? categoryEmoji[pin.category] ?? "📍" : "📍"}
-                </span>
-                <p className="line-clamp-2 text-xs font-medium text-foreground/80">
-                  {pin.name}
-                </p>
+              <div key={pin.id} className={`relative overflow-hidden bg-gradient-to-br ${coverGradients[i % coverGradients.length]} p-2`}>
+                {pin.media?.[0]?.url ? (
+                  <img
+                    src={pin.media[0].thumbnail ?? pin.media[0].url}
+                    alt={pin.name}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                ) : (
+                  <>
+                    <span className="absolute right-2 top-2 text-sm">
+                      {pin.category ? categoryEmoji[pin.category] ?? "📍" : "📍"}
+                    </span>
+                    <p className="line-clamp-2 text-xs font-medium text-foreground/80">
+                      {pin.name}
+                    </p>
+                  </>
+                )}
               </div>
             ))}
             {Array.from({ length: Math.max(0, 4 - coverItems.length) }).map((_, i) => (

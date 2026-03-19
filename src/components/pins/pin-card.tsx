@@ -20,6 +20,11 @@ interface PinCardProps {
     country: string | null;
     category: string | null;
     notes: string | null;
+    media?: Array<{
+      id: string;
+      url: string;
+      thumbnail: string | null;
+    }>;
     addedByUser: { displayName: string; avatarUrl: string | null } | null;
     votes: Array<{ voteType: string; userId: string }>;
     comments: Array<unknown>;
@@ -136,6 +141,16 @@ export function PinCard({
         <p className="mt-1.5 line-clamp-2 text-xs text-gray-600">
           {pin.notes}
         </p>
+      )}
+      {pin.media?.[0]?.url && (
+        <div className="mt-2 overflow-hidden rounded-md border border-gray-200">
+          <img
+            src={pin.media[0].thumbnail ?? pin.media[0].url}
+            alt={pin.name}
+            className="h-24 w-full object-cover"
+            loading="lazy"
+          />
+        </div>
       )}
 
       <div className="mt-2 flex items-center justify-between">

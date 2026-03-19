@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   useBoards,
   useDeleteBoard,
+  useSeedDemoPlans,
   useUpdateBoardMode,
 } from "@/lib/api/hooks";
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,7 @@ export default function DashboardPage() {
 
   const { data: boards, isLoading } = useBoards();
   const deleteBoard = useDeleteBoard();
+  const seedDemoPlans = useSeedDemoPlans();
   const updateBoardMode = useUpdateBoardMode();
 
   const filteredBoards = useMemo(() => {
@@ -239,6 +241,14 @@ export default function DashboardPage() {
               </>
             ) : (
               <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={seedDemoPlans.isPending}
+                  onClick={() => seedDemoPlans.mutate()}
+                >
+                  {seedDemoPlans.isPending ? "Loading..." : "Load Demo Plans"}
+                </Button>
                 <Button variant="outline" size="sm" onClick={() => setIsJoinOpen(true)}>
                   <UserPlus className="mr-1.5 h-4 w-4" />
                   Join

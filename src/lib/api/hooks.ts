@@ -45,6 +45,19 @@ export function useCreateBoard() {
   });
 }
 
+export function useSeedDemoPlans() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () =>
+      apiFetch<{ ok: boolean; message: string }>("/api/dev/seed-demo", {
+        method: "POST",
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.boards });
+    },
+  });
+}
+
 export function useDeleteBoard() {
   const queryClient = useQueryClient();
   return useMutation({

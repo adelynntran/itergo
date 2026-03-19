@@ -18,7 +18,7 @@ export async function GET() {
       board: {
         with: {
           members: { with: { user: true } },
-          pins: true,
+          pins: { with: { media: true } },
         },
       },
     },

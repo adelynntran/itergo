@@ -22,6 +22,11 @@ interface Pin {
   longitude: number | null;
   category: string | null;
   notes: string | null;
+  media?: Array<{
+    id: string;
+    url: string;
+    thumbnail: string | null;
+  }>;
   addedByUser: { displayName: string; avatarUrl: string | null } | null;
   votes: Array<{ voteType: string; userId: string }>;
   comments: Array<unknown>;
