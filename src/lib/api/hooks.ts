@@ -12,6 +12,7 @@ export const queryKeys = {
   boardPins: (boardId: string) => ["boards", boardId, "pins"] as const,
   pinComments: (pinId: string) => ["pins", pinId, "comments"] as const,
   locationsBin: ["locations-bin"] as const,
+  profile: ["profile"] as const,
 };
 
 // ============ Board Hooks ============
@@ -54,6 +55,47 @@ export function useSeedDemoPlans() {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.boards });
+    },
+  });
+}
+
+export function useProfile() {
+  return useQuery({
+    queryKey: queryKeys.profile,
+    queryFn: () =>
+      apiFetch<{
+        id: string;
+        email: string;
+        displayName: string;
+        avatarUrl: string | null;
+        bio: string | null;
+        interestTags: string[] | null;
+      }>("/api/profile"),
+  });
+}
+
+export function useUpdateProfile() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: {
+      displayName?: string;
+      avatarUrl?: string | null;
+      bio?: string | null;
+      interestTags?: string[];
+    }) =>
+      apiFetch<{
+        id: string;
+        email: string;
+        displayName: string;
+        avatarUrl: string | null;
+        bio: string | null;
+        interestTags: string[] | null;
+      }>("/api/profile", {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile });
     },
   });
 }

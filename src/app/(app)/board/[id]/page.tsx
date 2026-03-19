@@ -196,7 +196,7 @@ export default function BoardPage() {
               </div>
             )}
 
-            <div className="absolute right-4 top-[132px] z-20 flex gap-2">
+            <div className="absolute left-4 top-[132px] z-20 flex gap-2">
               <Button
                 variant="outline"
                 size="icon"
