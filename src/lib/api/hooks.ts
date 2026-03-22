@@ -64,7 +64,7 @@ export function useUpdateBoardMode() {
       boardMode,
     }: {
       boardId: string;
-      boardMode: "dream" | "execution" | "travel";
+      boardMode: "dream" | "execution" | "travel" | "momento";
     }) =>
       apiFetch<{ id: string; boardMode: string }>(`/api/boards/${boardId}`, {
         method: "PATCH",

@@ -127,3 +127,152 @@
     @apply font-sans;
   }
 }
+
+/* ============================================================
+   BOOKSHELF — Momento Mode
+   ============================================================ */
+
+:root {
+  --bookshelf-wood: oklch(0.45 0.06 55);
+  --bookshelf-wood-light: oklch(0.58 0.07 60);
+  --bookshelf-wood-dark: oklch(0.35 0.05 50);
+  --bookshelf-cream: oklch(0.94 0.02 85);
+  --bookshelf-shadow: oklch(0.3 0.04 50 / 40%);
+}
+
+.bookshelf-container {
+  background:
+    linear-gradient(180deg, var(--bookshelf-cream) 0%, oklch(0.92 0.015 80) 100%);
+  min-height: 100%;
+}
+
+.bookshelf-shelf {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 0 24px 0 24px;
+  min-height: 220px;
+}
+
+/* The wooden plank */
+.bookshelf-shelf::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background:
+    linear-gradient(
+      180deg,
+      var(--bookshelf-wood-light) 0%,
+      var(--bookshelf-wood) 40%,
+      var(--bookshelf-wood-dark) 100%
+    );
+  border-radius: 2px;
+  box-shadow:
+    0 4px 8px var(--bookshelf-shadow),
+    0 2px 4px oklch(0.3 0.04 50 / 20%);
+}
+
+/* Front edge highlight */
+.bookshelf-shelf::before {
+  content: "";
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    180deg,
+    oklch(0.65 0.06 60 / 60%) 0%,
+    transparent 100%
+  );
+  z-index: 2;
+}
+
+.book-spine {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  border-radius: 3px 6px 6px 3px;
+  box-shadow:
+    2px 2px 6px oklch(0.2 0.03 50 / 25%),
+    inset -2px 0 4px oklch(0 0 0 / 8%),
+    inset 2px 0 3px oklch(1 0 0 / 15%);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: bottom left;
+  z-index: 1;
+  padding-bottom: 14px; /* sits above the shelf plank */
+  user-select: none;
+}
+
+.book-spine:hover {
+  transform: rotateY(-18deg) translateX(-6px) translateZ(10px);
+  z-index: 10;
+  box-shadow:
+    6px 4px 16px oklch(0.2 0.03 50 / 35%),
+    inset -2px 0 4px oklch(0 0 0 / 8%),
+    inset 2px 0 3px oklch(1 0 0 / 15%);
+}
+
+.book-spine-title {
+  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  text-shadow: 0 1px 2px oklch(0 0 0 / 15%);
+}
+
+.book-spine-meta {
+  font-size: 0.6rem;
+  opacity: 0.7;
+  letter-spacing: 0.05em;
+  margin-top: 8px;
+}
+
+/* Cover peek on hover */
+.book-cover-peek {
+  position: absolute;
+  top: 4px;
+  left: -80px;
+  width: 72px;
+  height: 100px;
+  border-radius: 4px;
+  object-fit: cover;
+  opacity: 0;
+  transform: rotateY(15deg) scale(0.9);
+  transition: all 0.3s ease;
+  box-shadow: 2px 3px 10px oklch(0 0 0 / 25%);
+  pointer-events: none;
+  z-index: 20;
+}
+
+.book-spine:hover .book-cover-peek {
+  opacity: 1;
+  transform: rotateY(0deg) scale(1);
+}
+
+.book-ghost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed oklch(0.5 0.03 55 / 35%);
+  border-radius: 3px 6px 6px 3px;
+  opacity: 0.5;
+  cursor: pointer;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+  padding-bottom: 14px;
+}
+
+.book-ghost:hover {
+  opacity: 0.8;
+  border-color: oklch(0.5 0.03 55 / 60%);
+}

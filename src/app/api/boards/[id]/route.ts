@@ -50,7 +50,7 @@ export async function GET(req: NextRequest, { params }: Params) {
 const updateSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   description: z.string().max(500).optional(),
-  boardMode: z.enum(["dream", "execution", "travel"]).optional(),
+  boardMode: z.enum(["dream", "execution", "travel", "momento"]).optional(),
 });
 
 export async function PATCH(req: NextRequest, { params }: Params) {
@@ -74,8 +74,23 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     parsed.data.name === undefined &&
     parsed.data.description === undefined;
 
-  if (parsed.data.boardMode && parsed.data.boardMode !== "execution") {
-    return badRequest("Only transition to execution is available in this version");
+  // Validate mode transitions: dream→execution→travel→momento
+  if (parsed.data.boardMode) {
+    const current = await db.query.dreamBoards.findFirst({
+      where: eq(dreamBoards.id, id),
+      columns: { boardMode: true },
+    });
+    const validTransitions: Record<string, string[]> = {
+      dream: ["execution"],
+      execution: ["travel"],
+      travel: ["momento"],
+    };
+    const allowed = validTransitions[current?.boardMode ?? "dream"] ?? [];
+    if (!allowed.includes(parsed.data.boardMode)) {
+      return badRequest(
+        `Cannot transition from "${current?.boardMode ?? "dream"}" to "${parsed.data.boardMode}"`
+      );
+    }
   }
 
   const roleCheck = await requireRole(
@@ -85,15 +100,17 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   );
   if ("error" in roleCheck) return roleCheck.error;
 
-  const modeUpdate: {
-    boardMode?: "dream" | "execution" | "travel";
-    executionStartedAt?: Date;
-  } = {};
+  const modeUpdate: Record<string, unknown> = {};
 
   if (parsed.data.boardMode !== undefined) {
     modeUpdate.boardMode = parsed.data.boardMode;
+    const now = new Date();
     if (parsed.data.boardMode === "execution") {
-      modeUpdate.executionStartedAt = new Date();
+      modeUpdate.executionStartedAt = now;
+    } else if (parsed.data.boardMode === "travel") {
+      modeUpdate.travelStartedAt = now;
+    } else if (parsed.data.boardMode === "momento") {
+      modeUpdate.momentoStartedAt = now;
     }
   }
 

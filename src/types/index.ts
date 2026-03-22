@@ -23,6 +23,7 @@ export type LocationBinItem = InferSelectModel<typeof locationsBin>;
 
 export type BoardRole = "host" | "editor" | "viewer";
 export type VoteType = "upvote" | "heart" | "must_do";
+export type BoardMode = "dream" | "execution" | "travel" | "momento";
 export type PinCategory =
   | "food"
   | "nature"
