@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   useBoards,
   useDeleteBoard,
@@ -10,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { BoardCard } from "@/components/boards/board-card";
 import { CreateBoardDialog } from "@/components/boards/create-board-dialog";
 import { JoinBoardDialog } from "@/components/boards/join-board-dialog";
+import { MomentoBookshelf } from "@/components/momento/bookshelf";
+import type { BoardMode } from "@/types";
 import {
   Plus,
   CheckSquare,
@@ -17,9 +20,23 @@ import {
   UserPlus,
   Sparkles,
   GitMerge,
+  Cloud,
+  Plane,
+  BookOpen,
 } from "lucide-react";
 
+const MODE_TABS: { mode: BoardMode; label: string; icon: typeof Cloud }[] = [
+  { mode: "dream", label: "Dream", icon: Cloud },
+  { mode: "execution", label: "Execution", icon: Sparkles },
+  { mode: "travel", label: "Travel", icon: Plane },
+  { mode: "momento", label: "Momento", icon: BookOpen },
+];
+
 export default function DashboardPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const activeMode = (searchParams.get("mode") as BoardMode) || "dream";
+
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isJoinOpen, setIsJoinOpen] = useState(false);
   const [selectMode, setSelectMode] = useState(false);
@@ -29,6 +46,22 @@ export default function DashboardPage() {
 
   const deleteBoard = useDeleteBoard();
   const updateBoardMode = useUpdateBoardMode();
+
+  const setMode = (mode: BoardMode) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("mode", mode);
+    router.push(`/dashboard?${params.toString()}`);
+    setSelectMode(false);
+    setSelected(new Set());
+  };
+
+  const filteredBoards = useMemo(() => {
+    if (!boards) return [];
+    return boards.filter((board: any) => {
+      const boardMode = board.boardMode ?? "dream";
+      return boardMode === activeMode;
+    });
+  }, [boards, activeMode]);
 
   const toggleSelect = (id: string) => {
     setSelected((prev) => {
@@ -78,7 +111,7 @@ export default function DashboardPage() {
   return (
     <div className="p-6 lg:p-8">
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Plan Cards</h1>
           <p className="mt-1 text-sm text-gray-500">
@@ -126,7 +159,7 @@ export default function DashboardPage() {
                 Cancel
               </Button>
             </>
-          ) : (
+          ) : activeMode !== "momento" ? (
             <>
               <Button
                 variant="outline"
@@ -149,14 +182,43 @@ export default function DashboardPage() {
                 New Board
               </Button>
             </>
-          )}
+          ) : null}
         </div>
       </div>
 
-      {/* Board Grid */}
-      {boards && boards.length > 0 ? (
+      {/* Mode Tabs */}
+      <div className="mb-6 flex items-center justify-center">
+        <div className="flex items-center gap-1 rounded-full border border-border bg-card/90 p-1 shadow-sm">
+          {MODE_TABS.map(({ mode, label, icon: Icon }) => (
+            <button
+              key={mode}
+              onClick={() => setMode(mode)}
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+                activeMode === mode
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              }`}
+            >
+              <Icon className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">{label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Content */}
+      {activeMode === "momento" ? (
+        <MomentoBookshelf
+          boards={filteredBoards}
+          onGhostClick={() =>
+            window.alert(
+              "Complete a trip in Travel mode to create a Momento book!"
+            )
+          }
+        />
+      ) : filteredBoards.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {boards.map((board) => (
+          {filteredBoards.map((board: any) => (
             <BoardCard
               key={board.id}
               board={board}

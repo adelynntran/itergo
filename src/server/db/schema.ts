@@ -101,6 +101,8 @@ export const dreamBoards = pgTable("dream_boards", {
     withTimezone: true,
   }),
   travelStartedAt: timestamp("travel_started_at", { withTimezone: true }),
+  momentoStartedAt: timestamp("momento_started_at", { withTimezone: true }),
+  momentoCoverUrl: text("momento_cover_url"),
   visibility: text("visibility").notNull().default("group"),
   inviteCode: text("invite_code").unique(),
   invitePin: text("invite_pin"),
