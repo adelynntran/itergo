@@ -34,10 +34,10 @@ function getSpineColor(id: string) {
 }
 
 function getSpineWidth(pinCount: number): number {
-  if (pinCount <= 3) return 44;
-  if (pinCount <= 6) return 52;
-  if (pinCount <= 10) return 60;
-  return 70;
+  if (pinCount <= 3) return 52;
+  if (pinCount <= 6) return 60;
+  if (pinCount <= 10) return 68;
+  return 78;
 }
 
 interface BookSpineProps {
@@ -81,7 +81,7 @@ export function BookSpine({ board }: BookSpineProps) {
         backgroundColor: color,
         color: textColor,
         width: `${width}px`,
-        height: "190px",
+        height: "220px",
       }}
       onClick={() => router.push(`/board/${board.id}`)}
       title={board.name}

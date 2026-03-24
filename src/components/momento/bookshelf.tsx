@@ -41,21 +41,21 @@ export function MomentoBookshelf({
   }, [boards]);
 
   return (
-    <div className="bookshelf-container rounded-xl p-6">
+    <div className="bookshelf-container rounded-xl p-7">
       {/* Header */}
-      <div className="mb-8 flex items-center gap-3 px-6">
+      <div className="mb-10 flex items-center gap-3 px-6">
         <BookOpen
-          className="h-6 w-6"
+          className="h-7 w-7"
           style={{ color: "oklch(0.45 0.06 55)" }}
         />
         <div>
           <h2
-            className="font-display text-xl font-semibold"
+            className="font-display text-2xl font-semibold"
             style={{ color: "oklch(0.3 0.04 50)" }}
           >
             Your Travel Books
           </h2>
-          <p className="text-sm" style={{ color: "oklch(0.5 0.03 50)" }}>
+          <p className="text-base" style={{ color: "oklch(0.5 0.03 50)" }}>
             {boards.length === 0
               ? "Complete a trip to start your collection"
               : `${boards.length} ${boards.length === 1 ? "book" : "books"} on your shelf`}
@@ -64,7 +64,7 @@ export function MomentoBookshelf({
       </div>
 
       {/* Desktop: Bookshelf rows */}
-      <div className="hidden sm:block space-y-10">
+      <div className="hidden sm:block space-y-12">
         {shelves.map((shelfBoards, i) => (
           <BookshelfRow
             key={i}

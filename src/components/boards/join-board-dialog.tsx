@@ -46,16 +46,16 @@ export function JoinBoardDialog({ open, onOpenChange }: JoinBoardDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-paper border-paper-kraft">
         <DialogHeader>
-          <DialogTitle>Join a Dream Board</DialogTitle>
-          <DialogDescription>
-            Enter the invite code shared by your friend
+          <DialogTitle className="font-handwriting text-2xl text-ink">join a board</DialogTitle>
+          <DialogDescription className="text-ink-light">
+            enter the invite code from your friend
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="invite-code">Invite Code</Label>
+            <Label htmlFor="invite-code" className="font-handwriting text-base text-ink-medium">invite code</Label>
             <Input
               id="invite-code"
               placeholder="e.g., ABC123"
@@ -65,7 +65,7 @@ export function JoinBoardDialog({ open, onOpenChange }: JoinBoardDialogProps) {
                 setError("");
               }}
               maxLength={6}
-              className="text-center text-lg tracking-widest"
+              className="border-0 border-b-2 border-dashed border-paper-kraft bg-transparent rounded-none px-1 text-center font-handwriting text-2xl tracking-widest focus-visible:border-ink focus-visible:ring-0"
               required
               autoFocus
             />
@@ -75,15 +75,17 @@ export function JoinBoardDialog({ open, onOpenChange }: JoinBoardDialogProps) {
             <Button
               type="button"
               variant="outline"
+              className="border-dashed"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              cancel
             </Button>
             <Button
               type="submit"
+              className="kraft-paper text-ink border-none"
               disabled={!code.trim() || joinByCode.isPending}
             >
-              {joinByCode.isPending ? "Joining..." : "Join Board"}
+              {joinByCode.isPending ? "joining..." : "join board"}
             </Button>
           </DialogFooter>
         </form>

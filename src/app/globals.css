@@ -4,11 +4,19 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ============================================================
+   THEME — Tailwind v4 CSS-first config
+   ============================================================ */
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-handwriting: var(--font-handwriting);
   --font-mono: var(--font-geist-mono);
+
+  /* Semantic colors */
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -45,75 +53,96 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Scrapbook palette */
+  --color-paper: #FEFCF8;
+  --color-paper-cream: #F5F0E6;
+  --color-paper-aged: #E8E0D0;
+  --color-paper-kraft: #C4B7A3;
+  --color-ink: #2C2416;
+  --color-ink-medium: #5D4E37;
+  --color-ink-light: #8B7B65;
+  --color-tape-peach: #D4C0A8;
+  --color-tape-pink: #D8C4C0;
+  --color-tape-mint: #B5C9BF;
+  --color-tape-yellow: #D6CBAA;
+
+  /* Mode colors — muted vintage palette */
+  --color-dream: #7A8A6B;
+  --color-dream-light: #E4E8DE;
+  --color-dream-text: #4A5840;
+  --color-execution: #A88050;
+  --color-execution-light: #EDE4D6;
+  --color-execution-text: #6B4F2E;
+  --color-travel: #6A839A;
+  --color-travel-light: #DDE3EA;
+  --color-travel-text: #3A5068;
+  --color-momento: #8B7399;
+  --color-momento-light: #E6DDE9;
+  --color-momento-text: #5A4566;
 }
+
+/* ============================================================
+   ROOT — Scrapbook warm palette (replaces OKLCH grayscale)
+   ============================================================ */
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
+  --background: #F5F0E6;
+  --foreground: #2C2416;
+  --card: #FEFCF8;
+  --card-foreground: #2C2416;
+  --popover: #FEFCF8;
+  --popover-foreground: #2C2416;
+  --primary: #2C2416;
+  --primary-foreground: #FEFCF8;
+  --secondary: #E8E0D0;
+  --secondary-foreground: #2C2416;
+  --muted: #E8E0D0;
+  --muted-foreground: #8B7B65;
+  --accent: #E8E0D0;
+  --accent-foreground: #2C2416;
+  --destructive: #DC2626;
+  --border: #C4B7A3;
+  --input: #C4B7A3;
+  --ring: #5D4E37;
+  --chart-1: #8A9A5B;
+  --chart-2: #CC7A00;
+  --chart-3: #4A6FA5;
+  --chart-4: #8E44AD;
+  --chart-5: #C0392B;
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Sidebar */
+  --sidebar: #FEFCF8;
+  --sidebar-foreground: #2C2416;
+  --sidebar-primary: #2C2416;
+  --sidebar-primary-foreground: #FEFCF8;
+  --sidebar-accent: #E8E0D0;
+  --sidebar-accent-foreground: #2C2416;
+  --sidebar-border: #C4B7A3;
+  --sidebar-ring: #5D4E37;
+
+  /* Scrapbook tokens (for CSS classes) */
+  --paper-cream: #F5F0E6;
+  --paper-white: #FEFCF8;
+  --paper-aged: #E8E0D0;
+  --paper-kraft: #C4B7A3;
+  --ink-dark: #2C2416;
+  --ink-medium: #5D4E37;
+  --ink-light: #8B7B65;
+  --tape-peach: #D4C0A8;
+  --tape-pink: #D8C4C0;
+  --tape-mint: #B5C9BF;
+  --tape-yellow: #D6CBAA;
+  --washi-stripe: #D4C4A8;
+  --coffee-stain: rgba(139, 90, 43, 0.15);
+
+  /* Bookshelf (Momento) */
+  --bookshelf-wood: oklch(0.45 0.06 55);
+  --bookshelf-wood-light: oklch(0.58 0.07 60);
+  --bookshelf-wood-dark: oklch(0.35 0.05 50);
+  --bookshelf-cream: oklch(0.94 0.02 85);
+  --bookshelf-shadow: oklch(0.3 0.04 50 / 40%);
 }
 
 @layer base {
@@ -128,17 +157,709 @@
   }
 }
 
+
+/* ============================================================
+   SCRAPBOOK — Paper textures
+   ============================================================ */
+
+/* Paper texture variants controlled at the body level */
+.paper-canvas-soft {
+  --paper-canvas-base: #f6f2e9;
+  --paper-canvas-glow: 0.46;
+  --paper-canvas-warm-shadow: 0.08;
+  --paper-canvas-crease: 0.07;
+  --paper-canvas-sheen: 0.34;
+  --paper-canvas-fiber: 0.011;
+}
+
+.paper-canvas-warm {
+  --paper-canvas-base: #f2ecdf;
+  --paper-canvas-glow: 0.54;
+  --paper-canvas-warm-shadow: 0.15;
+  --paper-canvas-crease: 0.13;
+  --paper-canvas-sheen: 0.45;
+  --paper-canvas-fiber: 0.022;
+}
+
+/* Subtle rough paper canvas with gentle wrinkles */
+.paper-canvas {
+  background-color: var(--paper-canvas-base, var(--paper-cream));
+  background-image:
+    radial-gradient(150% 120% at 18% 6%, rgba(255, 255, 255, var(--paper-canvas-glow, 0.46)) 0%, rgba(255, 255, 255, 0) 58%),
+    radial-gradient(130% 120% at 85% 82%, rgba(170, 146, 116, var(--paper-canvas-warm-shadow, 0.08)) 0%, rgba(170, 146, 116, 0) 62%),
+    linear-gradient(145deg, transparent 68%, rgba(127, 105, 76, var(--paper-canvas-crease, 0.07)) 71%, transparent 76%),
+    linear-gradient(8deg, rgba(255, 255, 255, var(--paper-canvas-sheen, 0.34)) 0%, rgba(255, 255, 255, 0) 35%),
+    repeating-linear-gradient(
+      95deg,
+      rgba(93, 78, 55, var(--paper-canvas-fiber, 0.011)) 0px,
+      rgba(93, 78, 55, var(--paper-canvas-fiber, 0.011)) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 260px 260px;
+}
+
+/* Torn paper edge using clip-path */
+.torn-paper {
+  position: relative;
+  background: var(--paper-white);
+  clip-path: polygon(
+    0% 2%, 3% 0%, 7% 2%, 11% 0%, 15% 1%, 19% 0%, 23% 2%, 27% 0%, 31% 1%, 35% 0%,
+    39% 2%, 43% 0%, 47% 1%, 51% 0%, 55% 2%, 59% 0%, 63% 1%, 67% 0%, 71% 2%, 75% 0%,
+    79% 1%, 83% 0%, 87% 2%, 91% 0%, 95% 1%, 100% 0%,
+    100% 98%, 97% 100%, 93% 98%, 89% 100%, 85% 99%, 81% 100%, 77% 98%, 73% 100%, 69% 99%, 65% 100%,
+    61% 98%, 57% 100%, 53% 99%, 49% 100%, 45% 98%, 41% 100%, 37% 99%, 33% 100%, 29% 98%, 25% 100%,
+    21% 99%, 17% 100%, 13% 98%, 9% 100%, 5% 99%, 0% 100%
+  );
+}
+
+.torn-bottom {
+  position: relative;
+}
+
+.torn-bottom::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: inherit;
+  clip-path: polygon(
+    0% 0%, 100% 0%,
+    100% 40%, 97% 80%, 94% 30%, 91% 70%, 88% 20%, 85% 60%, 82% 30%, 79% 80%, 76% 40%,
+    73% 70%, 70% 20%, 67% 60%, 64% 30%, 61% 80%, 58% 40%, 55% 70%, 52% 20%, 49% 60%,
+    46% 30%, 43% 80%, 40% 40%, 37% 70%, 34% 20%, 31% 60%, 28% 30%, 25% 80%, 22% 40%,
+    19% 70%, 16% 20%, 13% 60%, 10% 30%, 7% 80%, 4% 40%, 0% 60%
+  );
+}
+
+/* Notebook paper with lines */
+.lined-paper {
+  background-color: var(--paper-white);
+  background-image:
+    repeating-linear-gradient(
+      transparent,
+      transparent 27px,
+      var(--paper-aged) 27px,
+      var(--paper-aged) 28px
+    );
+  background-position: 0 40px;
+}
+
+/* Dotted paper */
+.dotted-paper {
+  background-color: var(--paper-white);
+  background-image: radial-gradient(circle, var(--washi-stripe) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Grid paper */
+.grid-paper {
+  background-color: var(--paper-white);
+  background-image:
+    linear-gradient(var(--paper-aged) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper-aged) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Spiral notebook holes */
+.spiral-holes {
+  position: relative;
+}
+
+.spiral-holes::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 15px,
+    var(--paper-cream) 15px,
+    var(--paper-cream) 20px,
+    transparent 20px,
+    transparent 25px
+  );
+}
+
+/* ============================================================
+   SCRAPBOOK — Tape & adhesive elements
+   ============================================================ */
+
+/* Masking tape */
+.masking-tape {
+  position: relative;
+}
+
+.masking-tape::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 70px;
+  height: 24px;
+  background: var(--tape-peach);
+  opacity: 0.85;
+  border-radius: 1px;
+}
+
+.masking-tape-left::before {
+  left: 15%;
+  transform: rotate(5deg);
+}
+
+.masking-tape-right::before {
+  left: 85%;
+  transform: rotate(-5deg);
+}
+
+/* Washi tape with stripe pattern */
+.washi-tape {
+  position: absolute;
+  width: 100px;
+  height: 28px;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--tape-mint),
+    var(--tape-mint) 4px,
+    rgba(255, 255, 255, 0.5) 4px,
+    rgba(255, 255, 255, 0.5) 8px
+  );
+  opacity: 0.9;
+}
+
+.washi-pink {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--tape-pink),
+    var(--tape-pink) 4px,
+    rgba(255, 255, 255, 0.4) 4px,
+    rgba(255, 255, 255, 0.4) 8px
+  );
+}
+
+.washi-yellow {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--tape-yellow),
+    var(--tape-yellow) 4px,
+    rgba(255, 255, 255, 0.5) 4px,
+    rgba(255, 255, 255, 0.5) 8px
+  );
+}
+
+/* ============================================================
+   SCRAPBOOK — Sticky notes & paper types
+   ============================================================ */
+
+.sticky-note {
+  background: linear-gradient(135deg, #EDE8D4 0%, #E4DDCA 100%);
+  box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05);
+  transform: rotate(-1deg);
+}
+
+.sticky-note-pink {
+  background: linear-gradient(135deg, #E8D8D4 0%, #DCCBC6 100%);
+}
+
+.sticky-note-blue {
+  background: linear-gradient(135deg, #D8DFE8 0%, #C8D2DE 100%);
+}
+
+.sticky-note-green {
+  background: linear-gradient(135deg, #DBE3D8 0%, #CDD8CA 100%);
+}
+
+/* Kraft paper */
+.kraft-paper {
+  background: var(--paper-kraft);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
+}
+
+/* ============================================================
+   SCRAPBOOK — Decorative elements
+   ============================================================ */
+
+/* Coffee stain */
+.coffee-stain {
+  position: relative;
+}
+
+.coffee-stain::after {
+  content: '';
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, transparent 30%, var(--coffee-stain) 50%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Rubber stamp effect */
+.rubber-stamp {
+  border: 3px solid currentColor;
+  border-radius: 4px;
+  padding: 6px 16px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: bold;
+  transform: rotate(-8deg);
+  opacity: 0.7;
+  font-family: var(--font-handwriting), cursive;
+}
+
+/* Photo with tape */
+.photo-taped {
+  position: relative;
+  padding: 8px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.photo-taped::before,
+.photo-taped::after {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 18px;
+  background: var(--tape-peach);
+  opacity: 0.85;
+}
+
+.photo-taped::before {
+  top: -8px;
+  left: 10%;
+  transform: rotate(-12deg);
+}
+
+.photo-taped::after {
+  top: -8px;
+  right: 10%;
+  transform: rotate(8deg);
+}
+
+/* Pushpin effect */
+.pushpin {
+  position: relative;
+}
+
+.pushpin::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  background: radial-gradient(circle at 35% 35%, #FF6B6B, #C0392B);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Doodle border */
+.doodle-border {
+  border: 2px dashed var(--ink-light);
+  border-radius: 2px;
+}
+
+/* Sketch underline */
+.sketch-underline {
+  text-decoration: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12'%3E%3Cpath d='M1 8c30-6 60 4 90-2s60 6 90-1' stroke='%235D4E37' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: bottom;
+  background-size: 100% 12px;
+  padding-bottom: 8px;
+}
+
+/* Crossed out text */
+.crossed-out {
+  position: relative;
+}
+
+.crossed-out::after {
+  content: '';
+  position: absolute;
+  left: -5%;
+  right: -5%;
+  top: 50%;
+  height: 2px;
+  background: var(--ink-dark);
+  transform: rotate(-2deg);
+}
+
+/* Paper clip */
+.paper-clip {
+  position: relative;
+}
+
+.paper-clip::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  right: 20px;
+  width: 25px;
+  height: 40px;
+  border: 3px solid #A0A0A0;
+  border-radius: 15px 15px 5px 5px;
+  border-bottom: none;
+  transform: rotate(15deg);
+}
+
+/* Scrapbook layered papers effect */
+.layered-papers {
+  position: relative;
+}
+
+.layered-papers::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  background: var(--paper-aged);
+  transform: rotate(1deg);
+  z-index: -1;
+  border-radius: 2px;
+}
+
+.layered-papers::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  background: var(--paper-kraft);
+  transform: rotate(-0.5deg);
+  z-index: -2;
+  border-radius: 2px;
+}
+
+/* Hand-drawn checkbox */
+.checkbox-hand {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--ink-medium);
+  border-radius: 3px;
+  position: relative;
+}
+
+.checkbox-hand.checked::after {
+  content: '\2713';
+  position: absolute;
+  top: -4px;
+  left: 2px;
+  font-size: 20px;
+  color: var(--ink-dark);
+  font-family: var(--font-handwriting), cursive;
+}
+
+/* Vintage ticket */
+.ticket {
+  position: relative;
+  background: var(--paper-white);
+  padding: 12px 20px;
+}
+
+.ticket::before,
+.ticket::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: var(--paper-cream);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.ticket::before { left: -8px; }
+.ticket::after { right: -8px; }
+
+/* Postage stamp */
+.postage-stamp {
+  padding: 6px;
+  background: white;
+  border: 2px dotted var(--ink-light);
+  position: relative;
+}
+
+.postage-stamp::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid var(--ink-light);
+}
+
+/* Hand-drawn circle */
+.hand-circle {
+  position: relative;
+}
+
+.hand-circle::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border: 2px solid var(--ink-medium);
+  border-radius: 50% 45% 55% 50%;
+  transform: rotate(-5deg);
+}
+
+/* Scribble through */
+.scribble-through {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20'%3E%3Cpath d='M0 10 Q25 5 50 12 T100 8' stroke='%23C0392B' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+}
+
+/* Tag label (arrow shape) */
+.tag-label {
+  position: relative;
+  background: var(--paper-kraft);
+  padding: 8px 16px 8px 24px;
+  clip-path: polygon(15px 0%, 100% 0%, 100% 100%, 15px 100%, 0% 50%);
+}
+
+.tag-label::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--paper-cream);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================================
+   SCRAPBOOK — Additional effects
+   ============================================================ */
+
+/* Notebook spiral binding */
+.spiral-binding {
+  position: relative;
+  margin-left: 40px;
+}
+
+.spiral-binding::before {
+  content: '';
+  position: absolute;
+  left: -30px;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 30'%3E%3Cellipse cx='10' cy='15' rx='8' ry='6' fill='none' stroke='%23888' stroke-width='2'/%3E%3C/svg%3E");
+  background-repeat: repeat-y;
+  background-size: 20px 30px;
+}
+
+/* Torn right edge */
+.torn-right {
+  position: relative;
+}
+
+.torn-right::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+  background: inherit;
+  clip-path: polygon(
+    0% 0%, 60% 0%, 40% 3%, 70% 6%, 30% 9%, 60% 12%, 40% 15%, 70% 18%, 30% 21%,
+    60% 24%, 40% 27%, 70% 30%, 30% 33%, 60% 36%, 40% 39%, 70% 42%, 30% 45%,
+    60% 48%, 40% 51%, 70% 54%, 30% 57%, 60% 60%, 40% 63%, 70% 66%, 30% 69%,
+    60% 72%, 40% 75%, 70% 78%, 30% 81%, 60% 84%, 40% 87%, 70% 90%, 30% 93%,
+    60% 96%, 40% 100%, 0% 100%
+  );
+}
+
+/* Paper fold corner */
+.paper-fold {
+  position: relative;
+}
+
+.paper-fold::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, 0.05) 50%);
+  box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Crumpled paper */
+.crumpled {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.03' numOctaves='3'/%3E%3CfeDisplacementMap in='SourceGraphic' scale='5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)' fill='%23E8E0D0' opacity='0.3'/%3E%3C/svg%3E");
+}
+
+/* Sticker effect */
+.sticker {
+  position: relative;
+  display: inline-block;
+}
+
+.sticker::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Wax seal */
+.wax-seal {
+  width: 50px;
+  height: 50px;
+  background: radial-gradient(circle at 30% 30%, #C0392B 0%, #962D22 100%);
+  border-radius: 50%;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #F5E6A3;
+  font-family: serif;
+  font-weight: bold;
+}
+
+/* String / twine */
+.string-attached {
+  position: relative;
+}
+
+.string-attached::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  width: 2px;
+  height: 35px;
+  background: #B8A082;
+  transform: rotate(10deg);
+  transform-origin: bottom;
+}
+
+/* Highlighted text marker effect */
+.marker-highlight {
+  background: linear-gradient(180deg, transparent 60%, rgba(255, 235, 59, 0.4) 60%);
+  padding: 0 4px;
+}
+
+.marker-pink {
+  background: linear-gradient(180deg, transparent 60%, rgba(255, 105, 180, 0.3) 60%);
+}
+
+.marker-green {
+  background: linear-gradient(180deg, transparent 60%, rgba(144, 238, 144, 0.4) 60%);
+}
+
+/* Pencil sketch effect */
+.pencil-sketch {
+  filter: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='sketch'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.02' numOctaves='3'/%3E%3CfeDisplacementMap in='SourceGraphic' scale='2'/%3E%3C/filter%3E%3C/svg%3E#sketch");
+}
+
+/* ============================================================
+   SCRAPBOOK — Organic rotations & animations
+   ============================================================ */
+
+.rotate-organic-1 { transform: rotate(-2.5deg); }
+.rotate-organic-2 { transform: rotate(1.8deg); }
+.rotate-organic-3 { transform: rotate(-1.2deg); }
+.rotate-organic-4 { transform: rotate(2.2deg); }
+.rotate-organic-5 { transform: rotate(-0.8deg); }
+.rotate-organic-6 { transform: rotate(1.5deg); }
+
+/* Animation delays */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* Fade in animation */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+/* Gentle floating */
+@keyframes gentle-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-5px) rotate(1deg); }
+}
+
+.float-gentle {
+  animation: gentle-float 4s ease-in-out infinite;
+}
+
+/* Handwritten arrow */
+.hand-arrow::after {
+  content: '\2192';
+  font-family: var(--font-handwriting), cursive;
+  font-size: 1.5em;
+  margin-left: 8px;
+}
+
+/* Ink blot */
+.ink-blot {
+  position: relative;
+}
+
+.ink-blot::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--ink-dark);
+  border-radius: 50% 40% 60% 45%;
+  opacity: 0.6;
+}
+
+/* ============================================================
+   SCRAPBOOK — Custom scrollbar (notebook style)
+   ============================================================ */
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--paper-aged);
+  border-left: 1px solid var(--paper-kraft);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--paper-kraft);
+  border-radius: 2px;
+  border: 2px solid var(--paper-aged);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-light);
+}
+
 /* ============================================================
    BOOKSHELF — Momento Mode
    ============================================================ */
-
-:root {
-  --bookshelf-wood: oklch(0.45 0.06 55);
-  --bookshelf-wood-light: oklch(0.58 0.07 60);
-  --bookshelf-wood-dark: oklch(0.35 0.05 50);
-  --bookshelf-cream: oklch(0.94 0.02 85);
-  --bookshelf-shadow: oklch(0.3 0.04 50 / 40%);
-}
 
 .bookshelf-container {
   background:
@@ -152,7 +873,7 @@
   align-items: flex-end;
   gap: 6px;
   padding: 0 24px 0 24px;
-  min-height: 220px;
+  min-height: 250px;
 }
 
 /* The wooden plank */
@@ -209,7 +930,7 @@
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   transform-origin: bottom left;
   z-index: 1;
-  padding-bottom: 14px; /* sits above the shelf plank */
+  padding-bottom: 14px;
   user-select: none;
 }
 
@@ -223,28 +944,28 @@
 }
 
 .book-spine-title {
-  font-family: var(--font-display, "Cormorant Garamond", serif);
+  font-family: var(--font-display, "Playfair Display", serif);
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: 1rem;
   letter-spacing: 0.03em;
   line-height: 1.2;
   text-shadow: 0 1px 2px oklch(0 0 0 / 15%);
 }
 
 .book-spine-meta {
-  font-size: 0.6rem;
+  font-size: 0.72rem;
   opacity: 0.7;
   letter-spacing: 0.05em;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 /* Cover peek on hover */
 .book-cover-peek {
   position: absolute;
   top: 4px;
-  left: -80px;
-  width: 72px;
-  height: 100px;
+  left: -92px;
+  width: 82px;
+  height: 116px;
   border-radius: 4px;
   object-fit: cover;
   opacity: 0;
@@ -275,4 +996,17 @@
 .book-ghost:hover {
   opacity: 0.8;
   border-color: oklch(0.5 0.03 55 / 60%);
+}
+
+/* ============================================================
+   POLAROID — Card hover effect
+   ============================================================ */
+
+.polaroid-shadow {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.polaroid-shadow:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
 }
