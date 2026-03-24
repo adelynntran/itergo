@@ -20,6 +20,17 @@ import {
   Check,
 } from "lucide-react";
 
+type MomentoPin = {
+  id: string;
+  name: string;
+  city?: string | null;
+  notes?: string | null;
+  media?: Array<{
+    thumbnail?: string | null;
+    url?: string | null;
+  }>;
+};
+
 export default function BoardPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -108,7 +119,7 @@ export default function BoardPage() {
 
             {/* Scrapbook grid */}
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {board.pins.map((pin, i) => {
+              {board.pins.map((pin: MomentoPin, i: number) => {
                 const rotation = ((i % 5) - 2) * 1.2;
                 const coverUrl =
                   pin.media?.[0]?.thumbnail ?? pin.media?.[0]?.url ?? null;
