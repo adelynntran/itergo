@@ -149,9 +149,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
@@ -189,29 +191,199 @@
     radial-gradient(130% 120% at 85% 82%, rgba(170, 146, 116, var(--paper-canvas-warm-shadow, 0.08)) 0%, rgba(170, 146, 116, 0) 62%),
     linear-gradient(145deg, transparent 68%, rgba(127, 105, 76, var(--paper-canvas-crease, 0.07)) 71%, transparent 76%),
     linear-gradient(8deg, rgba(255, 255, 255, var(--paper-canvas-sheen, 0.34)) 0%, rgba(255, 255, 255, 0) 35%),
-    repeating-linear-gradient(
-      95deg,
+    repeating-linear-gradient(95deg,
       rgba(93, 78, 55, var(--paper-canvas-fiber, 0.011)) 0px,
       rgba(93, 78, 55, var(--paper-canvas-fiber, 0.011)) 1px,
       transparent 1px,
-      transparent 3px
-    );
+      transparent 3px);
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat;
   background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 260px 260px;
+}
+
+/* Analog fabric texture layer for app-wide background */
+.analog-fabric-canvas {
+  background-color: #f2eee5;
+  background-image: url("/analog/textures/fabric-texture.jpg");
+  background-size: 540px 540px;
+  background-position: center;
+  background-repeat: repeat;
+}
+
+/* Fabric texture background — used behind journals/notebooks */
+.fabric-bg {
+  background-image: url("/analog/textures/fabric-texture.jpg");
+  background-size: 400px 400px;
+  background-repeat: repeat;
+}
+
+/* Dashboard notebook spread — notebook on fabric */
+.analog-dashboard-canvas {
+  background-image: url("/analog/textures/fabric-texture.jpg");
+  background-size: 400px 400px;
+  background-repeat: repeat;
+}
+
+/* Dream mode board spread — open journal centered on fabric */
+.analog-dream-spread {
+  position: relative;
+  background-image: url("/analog/textures/fabric-texture.jpg");
+  background-size: 400px 400px;
+  background-repeat: repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: hidden;
+}
+
+/* The open journal wrapper — sized to fit within available space */
+.dream-journal {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 1200 / 1034;
+  filter: drop-shadow(0 6px 20px rgba(40, 30, 15, 0.25));
+}
+
+/* The journal background image — fills the wrapper exactly */
+.dream-journal-bg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+}
+
+/* Content overlay — sits on top of the journal pages */
+.dream-journal-content {
+  position: absolute;
+  /* Insets match where the cream pages sit inside the green cover */
+  top: 5%;
+  bottom: 5%;
+  left: 5.5%;
+  right: 5%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3%;
+}
+
+/* Left page (map) */
+.dream-journal-left {
+  overflow: hidden;
+  border-radius: 3px;
+}
+
+/* Right page (location list) */
+.dream-journal-right {
+  overflow: hidden;
+  border-radius: 3px;
+}
+
+/* Polaroid frame as map container */
+.dream-map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Map inset to match the polaroid's inner photo cutout exactly */
+.dream-map-wrapper>.dream-map-inner {
+  position: absolute;
+  top: 9%;
+  left: 8.6%;
+  right: 10.2%;
+  bottom: 23.6%;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* The polaroid frame sits ON TOP — transparent center reveals map */
+.dream-map-wrapper>.dream-map-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 3px 8px rgba(60, 45, 25, 0.2));
+}
+
+/* On smaller screens, drop the journal frame */
+@media (max-width: 768px) {
+  .analog-dream-spread {
+    padding: 0;
+  }
+
+  .dream-journal {
+    aspect-ratio: auto;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .dream-journal-bg {
+    display: none;
+  }
+
+  .dream-journal-content {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 100%;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 4px;
+    padding: 4px;
+  }
+}
+
+/* Notebook page — the notebook-bg sits as the content area on the dashboard */
+.notebook-page {
+  background-image: url("/analog/backgrounds/notebook-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 500px;
+  box-shadow:
+    0 4px 24px rgba(71, 53, 31, 0.12),
+    0 1px 4px rgba(71, 53, 31, 0.08);
+}
+
+/* Ring binder spine on the left edge */
+.notebook-page::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 48px;
+  background: linear-gradient(90deg,
+      rgba(90, 70, 50, 0.08) 0%,
+      rgba(90, 70, 50, 0.03) 60%,
+      transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.analog-auth-panel {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  box-shadow: 0 18px 36px rgba(71, 53, 31, 0.16);
 }
 
 /* Torn paper edge using clip-path */
 .torn-paper {
   position: relative;
   background: var(--paper-white);
-  clip-path: polygon(
-    0% 2%, 3% 0%, 7% 2%, 11% 0%, 15% 1%, 19% 0%, 23% 2%, 27% 0%, 31% 1%, 35% 0%,
-    39% 2%, 43% 0%, 47% 1%, 51% 0%, 55% 2%, 59% 0%, 63% 1%, 67% 0%, 71% 2%, 75% 0%,
-    79% 1%, 83% 0%, 87% 2%, 91% 0%, 95% 1%, 100% 0%,
-    100% 98%, 97% 100%, 93% 98%, 89% 100%, 85% 99%, 81% 100%, 77% 98%, 73% 100%, 69% 99%, 65% 100%,
-    61% 98%, 57% 100%, 53% 99%, 49% 100%, 45% 98%, 41% 100%, 37% 99%, 33% 100%, 29% 98%, 25% 100%,
-    21% 99%, 17% 100%, 13% 98%, 9% 100%, 5% 99%, 0% 100%
-  );
+  clip-path: polygon(0% 2%, 3% 0%, 7% 2%, 11% 0%, 15% 1%, 19% 0%, 23% 2%, 27% 0%, 31% 1%, 35% 0%,
+      39% 2%, 43% 0%, 47% 1%, 51% 0%, 55% 2%, 59% 0%, 63% 1%, 67% 0%, 71% 2%, 75% 0%,
+      79% 1%, 83% 0%, 87% 2%, 91% 0%, 95% 1%, 100% 0%,
+      100% 98%, 97% 100%, 93% 98%, 89% 100%, 85% 99%, 81% 100%, 77% 98%, 73% 100%, 69% 99%, 65% 100%,
+      61% 98%, 57% 100%, 53% 99%, 49% 100%, 45% 98%, 41% 100%, 37% 99%, 33% 100%, 29% 98%, 25% 100%,
+      21% 99%, 17% 100%, 13% 98%, 9% 100%, 5% 99%, 0% 100%);
 }
 
 .torn-bottom {
@@ -226,25 +398,21 @@
   right: 0;
   height: 12px;
   background: inherit;
-  clip-path: polygon(
-    0% 0%, 100% 0%,
-    100% 40%, 97% 80%, 94% 30%, 91% 70%, 88% 20%, 85% 60%, 82% 30%, 79% 80%, 76% 40%,
-    73% 70%, 70% 20%, 67% 60%, 64% 30%, 61% 80%, 58% 40%, 55% 70%, 52% 20%, 49% 60%,
-    46% 30%, 43% 80%, 40% 40%, 37% 70%, 34% 20%, 31% 60%, 28% 30%, 25% 80%, 22% 40%,
-    19% 70%, 16% 20%, 13% 60%, 10% 30%, 7% 80%, 4% 40%, 0% 60%
-  );
+  clip-path: polygon(0% 0%, 100% 0%,
+      100% 40%, 97% 80%, 94% 30%, 91% 70%, 88% 20%, 85% 60%, 82% 30%, 79% 80%, 76% 40%,
+      73% 70%, 70% 20%, 67% 60%, 64% 30%, 61% 80%, 58% 40%, 55% 70%, 52% 20%, 49% 60%,
+      46% 30%, 43% 80%, 40% 40%, 37% 70%, 34% 20%, 31% 60%, 28% 30%, 25% 80%, 22% 40%,
+      19% 70%, 16% 20%, 13% 60%, 10% 30%, 7% 80%, 4% 40%, 0% 60%);
 }
 
 /* Notebook paper with lines */
 .lined-paper {
   background-color: var(--paper-white);
   background-image:
-    repeating-linear-gradient(
-      transparent,
+    repeating-linear-gradient(transparent,
       transparent 27px,
       var(--paper-aged) 27px,
-      var(--paper-aged) 28px
-    );
+      var(--paper-aged) 28px);
   background-position: 0 40px;
 }
 
@@ -276,15 +444,13 @@
   top: 0;
   bottom: 0;
   width: 4px;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent,
-    transparent 15px,
-    var(--paper-cream) 15px,
-    var(--paper-cream) 20px,
-    transparent 20px,
-    transparent 25px
-  );
+  background: repeating-linear-gradient(to bottom,
+      transparent,
+      transparent 15px,
+      var(--paper-cream) 15px,
+      var(--paper-cream) 20px,
+      transparent 20px,
+      transparent 25px);
 }
 
 /* ============================================================
@@ -304,7 +470,7 @@
   transform: translateX(-50%) rotate(-2deg);
   width: 70px;
   height: 24px;
-  background: var(--tape-peach);
+  background: var(--masking-tape-color, var(--tape-peach));
   opacity: 0.85;
   border-radius: 1px;
 }
@@ -324,34 +490,28 @@
   position: absolute;
   width: 100px;
   height: 28px;
-  background: repeating-linear-gradient(
-    45deg,
-    var(--tape-mint),
-    var(--tape-mint) 4px,
-    rgba(255, 255, 255, 0.5) 4px,
-    rgba(255, 255, 255, 0.5) 8px
-  );
+  background: repeating-linear-gradient(45deg,
+      var(--tape-mint),
+      var(--tape-mint) 4px,
+      rgba(255, 255, 255, 0.5) 4px,
+      rgba(255, 255, 255, 0.5) 8px);
   opacity: 0.9;
 }
 
 .washi-pink {
-  background: repeating-linear-gradient(
-    -45deg,
-    var(--tape-pink),
-    var(--tape-pink) 4px,
-    rgba(255, 255, 255, 0.4) 4px,
-    rgba(255, 255, 255, 0.4) 8px
-  );
+  background: repeating-linear-gradient(-45deg,
+      var(--tape-pink),
+      var(--tape-pink) 4px,
+      rgba(255, 255, 255, 0.4) 4px,
+      rgba(255, 255, 255, 0.4) 8px);
 }
 
 .washi-yellow {
-  background: repeating-linear-gradient(
-    45deg,
-    var(--tape-yellow),
-    var(--tape-yellow) 4px,
-    rgba(255, 255, 255, 0.5) 4px,
-    rgba(255, 255, 255, 0.5) 8px
-  );
+  background: repeating-linear-gradient(45deg,
+      var(--tape-yellow),
+      var(--tape-yellow) 4px,
+      rgba(255, 255, 255, 0.5) 4px,
+      rgba(255, 255, 255, 0.5) 8px);
 }
 
 /* ============================================================
@@ -575,8 +735,13 @@
   transform: translateY(-50%);
 }
 
-.ticket::before { left: -8px; }
-.ticket::after { right: -8px; }
+.ticket::before {
+  left: -8px;
+}
+
+.ticket::after {
+  right: -8px;
+}
 
 /* Postage stamp */
 .postage-stamp {
@@ -671,13 +836,11 @@
   bottom: 0;
   width: 12px;
   background: inherit;
-  clip-path: polygon(
-    0% 0%, 60% 0%, 40% 3%, 70% 6%, 30% 9%, 60% 12%, 40% 15%, 70% 18%, 30% 21%,
-    60% 24%, 40% 27%, 70% 30%, 30% 33%, 60% 36%, 40% 39%, 70% 42%, 30% 45%,
-    60% 48%, 40% 51%, 70% 54%, 30% 57%, 60% 60%, 40% 63%, 70% 66%, 30% 69%,
-    60% 72%, 40% 75%, 70% 78%, 30% 81%, 60% 84%, 40% 87%, 70% 90%, 30% 93%,
-    60% 96%, 40% 100%, 0% 100%
-  );
+  clip-path: polygon(0% 0%, 60% 0%, 40% 3%, 70% 6%, 30% 9%, 60% 12%, 40% 15%, 70% 18%, 30% 21%,
+      60% 24%, 40% 27%, 70% 30%, 30% 33%, 60% 36%, 40% 39%, 70% 42%, 30% 45%,
+      60% 48%, 40% 51%, 70% 54%, 30% 57%, 60% 60%, 40% 63%, 70% 66%, 30% 69%,
+      60% 72%, 40% 75%, 70% 78%, 30% 81%, 60% 84%, 40% 87%, 70% 90%, 30% 93%,
+      60% 96%, 40% 100%, 0% 100%);
 }
 
 /* Paper fold corner */
@@ -770,19 +933,50 @@
    SCRAPBOOK — Organic rotations & animations
    ============================================================ */
 
-.rotate-organic-1 { transform: rotate(-2.5deg); }
-.rotate-organic-2 { transform: rotate(1.8deg); }
-.rotate-organic-3 { transform: rotate(-1.2deg); }
-.rotate-organic-4 { transform: rotate(2.2deg); }
-.rotate-organic-5 { transform: rotate(-0.8deg); }
-.rotate-organic-6 { transform: rotate(1.5deg); }
+.rotate-organic-1 {
+  transform: rotate(-2.5deg);
+}
+
+.rotate-organic-2 {
+  transform: rotate(1.8deg);
+}
+
+.rotate-organic-3 {
+  transform: rotate(-1.2deg);
+}
+
+.rotate-organic-4 {
+  transform: rotate(2.2deg);
+}
+
+.rotate-organic-5 {
+  transform: rotate(-0.8deg);
+}
+
+.rotate-organic-6 {
+  transform: rotate(1.5deg);
+}
 
 /* Animation delays */
-.delay-100 { animation-delay: 100ms; }
-.delay-200 { animation-delay: 200ms; }
-.delay-300 { animation-delay: 300ms; }
-.delay-400 { animation-delay: 400ms; }
-.delay-500 { animation-delay: 500ms; }
+.delay-100 {
+  animation-delay: 100ms;
+}
+
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+.delay-400 {
+  animation-delay: 400ms;
+}
+
+.delay-500 {
+  animation-delay: 500ms;
+}
 
 /* Fade in animation */
 @keyframes fade-in-up {
@@ -790,6 +984,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -803,8 +998,15 @@
 
 /* Gentle floating */
 @keyframes gentle-float {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-5px) rotate(1deg); }
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-5px) rotate(1deg);
+  }
 }
 
 .float-gentle {
@@ -885,12 +1087,10 @@
   right: 0;
   height: 14px;
   background:
-    linear-gradient(
-      180deg,
+    linear-gradient(180deg,
       var(--bookshelf-wood-light) 0%,
       var(--bookshelf-wood) 40%,
-      var(--bookshelf-wood-dark) 100%
-    );
+      var(--bookshelf-wood-dark) 100%);
   border-radius: 2px;
   box-shadow:
     0 4px 8px var(--bookshelf-shadow),
@@ -905,11 +1105,9 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(
-    180deg,
-    oklch(0.65 0.06 60 / 60%) 0%,
-    transparent 100%
-  );
+  background: linear-gradient(180deg,
+      oklch(0.65 0.06 60 / 60%) 0%,
+      transparent 100%);
   z-index: 2;
 }
 
@@ -1009,4 +1207,146 @@
 
 .polaroid-shadow:hover {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Plan card — uses a real polaroid/postcard image as the frame */
+.plan-card {
+  filter: drop-shadow(0 3px 8px rgba(60, 45, 25, 0.15));
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.plan-card:hover {
+  filter: drop-shadow(0 8px 20px rgba(60, 45, 25, 0.22));
+}
+
+/* ============================================================
+   AUTH — Notepad image-as-frame
+   ============================================================ */
+.auth-notepad {
+  position: relative;
+  width: min(700px, 95vw);
+  filter: drop-shadow(0 8px 30px rgba(60, 45, 25, 0.25));
+}
+
+.auth-notepad-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  position: relative;
+  z-index: 1;
+}
+
+/* Itergo logo cycler */
+.itergo-logo-wrap {
+  position: absolute;
+  top: 25px;
+  left: 25px;
+  z-index: 30;
+  width: fit-content;
+  height: fit-content;
+}
+
+.itergo-logo-wrap img {
+  width: 180px;
+  height: auto;
+  display: block;
+}
+
+/* Only the active image is shown; others hidden */
+.itergo-logo-wrap img[data-active="false"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+}
+
+/* Sign-up — double sized */
+.auth-notepad-signup {
+  position: relative;
+  width: min(760px, 92vw);
+  filter: drop-shadow(0 8px 30px rgba(60, 45, 25, 0.25));
+}
+
+.auth-notepad-signup .auth-notepad-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  position: relative;
+  z-index: 1;
+}
+
+/* Sign-in: */
+.auth-notepad-form-signin {
+  position: absolute;
+  z-index: 10;
+  top: 41%;
+  left: 8%;
+  right: 12%;
+  bottom: 14%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+@media (max-width: 820px) {
+  .auth-notepad {
+    width: min(760px, 98vw);
+  }
+
+  .auth-notepad-form-signin {
+    top: 50%;
+    left: 20%;
+    right: 7%;
+    bottom: 13%;
+  }
+}
+
+/* Sign-up: form on the torn cream paper with paperclip */
+/* Double-sized image, form stays on the cream paper */
+.auth-notepad-form-signup {
+  position: absolute;
+  z-index: 10;
+  top: 33%;
+  left: 33%;
+  right: 24%;
+  bottom: 22%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+@media (max-width: 900px) {
+  .auth-notepad-signup {
+    width: min(680px, 96vw);
+  }
+
+  .auth-notepad-form-signup {
+    top: 20%;
+    left: 20%;
+    right: 20%;
+    bottom: 17%;
+  }
+
+  .stroke-75 {
+    -webkit-text-stroke: 0.75px currentColor;
+  }
+
+  .stroke-sketch {
+    -webkit-text-stroke: 0.6px currentColor;
+    text-shadow:
+      -0.6px 0 currentColor,
+      0.6px 0 currentColor,
+      0 -0.6px currentColor,
+      0 0.6px currentColor,
+      -1.2px 0.5px currentColor,
+      1.1px -0.4px currentColor;
+  }
 }

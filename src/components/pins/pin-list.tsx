@@ -140,11 +140,12 @@ export function PinList({
                 : "No places match your filters"}
             </p>
           ) : (
-            filtered.map((pin) => (
+            filtered.map((pin, index) => (
               <PinCard
                 key={pin.id}
                 pin={pin}
                 boardId={boardId}
+                index={index}
                 isSelected={pin.id === selectedPinId}
                 canEdit={canEdit}
                 onClick={() => onPinSelect(pin.id)}

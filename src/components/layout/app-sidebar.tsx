@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -44,6 +44,7 @@ const navItems = [
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
 
   const user = session?.user;
@@ -64,32 +65,43 @@ export function AppSidebar() {
       <div className="flex h-16 items-center justify-between border-b border-dashed border-paper-kraft px-4">
         {!collapsed && (
           <Link href="/dashboard" className="flex items-center gap-2">
-            <span className="text-xl">📒</span>
             <span className="font-handwriting text-2xl text-ink">itergo</span>
           </Link>
         )}
         {collapsed && (
           <Link href="/dashboard" className="mx-auto">
-            <span className="text-xl">📒</span>
+            <span className="font-handwriting text-2xl text-ink">i</span>
           </Link>
         )}
         <Button
           variant="ghost"
           size="icon"
-          className={`h-8 w-8 text-ink-light hover:bg-paper-aged hover:text-ink ${collapsed ? "hidden" : ""}`}
+          className="h-8 w-8 text-ink-light hover:bg-paper-aged hover:text-ink"
           onClick={() => setCollapsed(!collapsed)}
         >
-          <ChevronLeft className="h-4 w-4" />
+          {collapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
         </Button>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1 px-2 py-3">
         {navItems.map((item) => {
+          const [itemPath, itemQuery] = item.href.split("?");
+          const itemParams = new URLSearchParams(itemQuery);
+          const hasQueryParams = itemParams.size > 0;
           const isActive =
-            pathname === item.href ||
-            (item.href === "/dashboard" && pathname === "/dashboard") ||
-            (item.href === "/locations-bin" && pathname === "/locations-bin");
+            pathname === itemPath &&
+            (hasQueryParams
+              ? [...itemParams.entries()].every(
+                  ([k, v]) => searchParams.get(k) === v
+                )
+              : // Prevent both dashboard links from being highlighted.
+                itemPath !== "/dashboard" ||
+                searchParams.get("filter") !== "shared");
           return (
             <Link
               key={item.href}
@@ -107,20 +119,6 @@ export function AppSidebar() {
           );
         })}
       </nav>
-
-      {/* Expand button when collapsed */}
-      {collapsed && (
-        <div className="px-2 py-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="mx-auto flex h-8 w-8 text-ink-light hover:bg-paper-aged"
-            onClick={() => setCollapsed(false)}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
 
       {/* User menu */}
       <div className="border-t border-dashed border-paper-kraft px-3 py-3">
