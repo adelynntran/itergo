@@ -12,6 +12,7 @@ import { BoardCard } from "@/components/boards/board-card";
 import { CreateBoardDialog } from "@/components/boards/create-board-dialog";
 import { JoinBoardDialog } from "@/components/boards/join-board-dialog";
 import { MomentoBookshelf } from "@/components/momento/bookshelf";
+import { modeConfig } from "@/lib/scrapbook";
 import type { BoardMode } from "@/types";
 import {
   Plus,
@@ -20,16 +21,13 @@ import {
   UserPlus,
   Sparkles,
   GitMerge,
-  Cloud,
-  Plane,
-  BookOpen,
 } from "lucide-react";
 
-const MODE_TABS: { mode: BoardMode; label: string; icon: typeof Cloud }[] = [
-  { mode: "dream", label: "Dream", icon: Cloud },
-  { mode: "execution", label: "Execution", icon: Sparkles },
-  { mode: "travel", label: "Travel", icon: Plane },
-  { mode: "momento", label: "Momento", icon: BookOpen },
+const MODE_TABS: { mode: BoardMode; label: string }[] = [
+  { mode: "dream", label: "dream" },
+  { mode: "execution", label: "execution" },
+  { mode: "travel", label: "live" },
+  { mode: "momento", label: "momento" },
 ];
 
 export default function DashboardPage() {
@@ -100,22 +98,28 @@ export default function DashboardPage() {
     );
   };
 
+  const mode = modeConfig[activeMode] ?? modeConfig.dream;
+
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center p-8">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+        <div className="font-handwriting text-2xl text-ink-light animate-pulse">
+          flipping through pages...
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 lg:p-8">
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Plan Cards</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Collect travel inspiration with your friends
+    <div className="p-7 lg:p-9">
+      {/* Header — sticky note style */}
+      <div className="mb-8 flex items-start justify-between">
+        <div className="sticky-note inline-block px-6 py-4">
+          <h1 className="font-handwriting text-4xl text-ink">
+            my plans
+          </h1>
+          <p className="mt-1 font-handwriting text-lg text-ink-medium">
+            collect, plan, go, remember
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -123,7 +127,7 @@ export default function DashboardPage() {
             <>
               <Button
                 variant="secondary"
-                size="sm"
+                size="default"
                 disabled={selected.size === 0 || updateBoardMode.isPending}
                 onClick={handleMoveToExecution}
               >
@@ -132,16 +136,16 @@ export default function DashboardPage() {
               </Button>
               <Button
                 variant="outline"
-                size="sm"
+                size="default"
                 disabled={selected.size === 0}
                 onClick={() => window.alert("Merge Plan Cards is coming soon.")}
               >
                 <GitMerge className="mr-1.5 h-4 w-4" />
-                Merge (Coming Soon)
+                Merge
               </Button>
               <Button
                 variant="destructive"
-                size="sm"
+                size="default"
                 disabled={selected.size === 0 || deleteBoard.isPending}
                 onClick={handleDeleteSelected}
               >
@@ -150,7 +154,7 @@ export default function DashboardPage() {
               </Button>
               <Button
                 variant="outline"
-                size="sm"
+                size="default"
                 onClick={() => {
                   setSelectMode(false);
                   setSelected(new Set());
@@ -163,7 +167,8 @@ export default function DashboardPage() {
             <>
               <Button
                 variant="outline"
-                size="sm"
+                size="default"
+                className="border-dashed"
                 onClick={() => setIsJoinOpen(true)}
               >
                 <UserPlus className="mr-1.5 h-4 w-4" />
@@ -171,13 +176,18 @@ export default function DashboardPage() {
               </Button>
               <Button
                 variant="outline"
-                size="sm"
+                size="default"
+                className="border-dashed"
                 onClick={() => setSelectMode(true)}
               >
                 <CheckSquare className="mr-1.5 h-4 w-4" />
                 Select
               </Button>
-              <Button size="sm" onClick={() => setIsCreateOpen(true)}>
+              <Button
+                size="default"
+                className="kraft-paper text-ink border-none font-medium"
+                onClick={() => setIsCreateOpen(true)}
+              >
                 <Plus className="mr-1.5 h-4 w-4" />
                 New Board
               </Button>
@@ -187,22 +197,25 @@ export default function DashboardPage() {
       </div>
 
       {/* Mode Tabs */}
-      <div className="mb-6 flex items-center justify-center">
-        <div className="flex items-center gap-1 rounded-full border border-border bg-card/90 p-1 shadow-sm">
-          {MODE_TABS.map(({ mode, label, icon: Icon }) => (
-            <button
-              key={mode}
-              onClick={() => setMode(mode)}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
-                activeMode === mode
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
-              }`}
-            >
-              <Icon className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">{label}</span>
-            </button>
-          ))}
+      <div className="mb-8 flex items-center justify-center">
+        <div className="flex items-center gap-1 rounded-2xl bg-paper p-1.5 shadow-sm">
+          {MODE_TABS.map(({ mode: tabMode, label }) => {
+            const isActive = activeMode === tabMode;
+            const tabConfig = modeConfig[tabMode];
+            return (
+              <button
+                key={tabMode}
+                onClick={() => setMode(tabMode)}
+                className={`rounded-xl px-6 py-2.5 font-handwriting text-xl transition-all ${
+                  isActive
+                    ? `${tabConfig.bg} ${tabConfig.text} shadow-sm`
+                    : "text-ink-light hover:text-ink hover:bg-paper-aged/50"
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -217,11 +230,12 @@ export default function DashboardPage() {
           }
         />
       ) : filteredBoards.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredBoards.map((board: any) => (
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredBoards.map((board: any, i: number) => (
             <BoardCard
               key={board.id}
               board={board}
+              index={i}
               selectMode={selectMode}
               isSelected={selected.has(board.id)}
               onToggleSelect={() => toggleSelect(board.id)}
@@ -229,30 +243,39 @@ export default function DashboardPage() {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 py-16">
-          <div className="rounded-full bg-indigo-50 p-4">
-            <Plus className="h-8 w-8 text-indigo-600" />
-          </div>
-          <h3 className="mt-4 text-lg font-medium text-gray-900">
-            No plan cards yet
+        <div className="lined-paper torn-paper mx-auto flex max-w-md flex-col items-center justify-center px-8 py-16">
+          <span className="font-handwriting text-4xl text-ink-light">{mode.label}</span>
+          <h3 className="mt-4 font-handwriting text-2xl text-ink">
+            nothing here yet
           </h3>
-          <p className="mt-1 text-sm text-gray-500">
-            Create your first plan card to start collecting travel ideas
+          <p className="mt-2 text-center text-base text-ink-light">
+            {activeMode === "dream"
+              ? "Start a new board and dump all your ideas!"
+              : activeMode === "execution"
+                ? "Move boards from Dream to start planning"
+                : "Activate Live mode on an execution board to go!"}
           </p>
-          <div className="mt-4 flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsJoinOpen(true)}
-            >
-              <UserPlus className="mr-1.5 h-4 w-4" />
-              Join a Board
-            </Button>
-            <Button size="sm" onClick={() => setIsCreateOpen(true)}>
-              <Plus className="mr-1.5 h-4 w-4" />
-              Create Board
-            </Button>
-          </div>
+          {activeMode === "dream" && (
+            <div className="mt-6 flex gap-3">
+              <Button
+                variant="outline"
+                size="default"
+                className="border-dashed"
+                onClick={() => setIsJoinOpen(true)}
+              >
+                <UserPlus className="mr-1.5 h-4 w-4" />
+                Join a Board
+              </Button>
+              <Button
+                size="default"
+                className="kraft-paper text-ink border-none"
+                onClick={() => setIsCreateOpen(true)}
+              >
+                <Plus className="mr-1.5 h-4 w-4" />
+                New Board
+              </Button>
+            </div>
+          )}
         </div>
       )}
 

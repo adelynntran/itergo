@@ -1,9 +1,22 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { DM_Sans, Playfair_Display, Caveat } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 
-const inter = Inter({ subsets: ["latin"] });
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-display",
+});
+
+const caveat = Caveat({
+  subsets: ["latin"],
+  variable: "--font-handwriting",
+});
 
 export const metadata: Metadata = {
   title: "Itergo - Plan Your Dream Trips Together",
@@ -18,7 +31,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased`}>
+      <body
+        className={`${dmSans.variable} ${playfair.variable} ${caveat.variable} paper-canvas paper-canvas-warm font-sans antialiased`}
+      >
         <Providers>{children}</Providers>
       </body>
     </html>

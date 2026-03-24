@@ -52,19 +52,20 @@ export function CreateBoardDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-paper border-paper-kraft">
         <DialogHeader>
-          <DialogTitle>Create Dream Board</DialogTitle>
-          <DialogDescription>
-            Start a new board to collect travel ideas with friends
+          <DialogTitle className="font-handwriting text-2xl text-ink">new board</DialogTitle>
+          <DialogDescription className="text-ink-light">
+            start a new board to collect ideas with friends
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="board-name">Board Name</Label>
+            <Label htmlFor="board-name" className="font-handwriting text-base text-ink-medium">name</Label>
             <Input
               id="board-name"
-              placeholder="e.g., Scotland 2026, Asia Bucket List"
+              placeholder="e.g., Scotland 2026, ramen crawl"
+              className="border-0 border-b-2 border-dashed border-paper-kraft bg-transparent rounded-none px-1 focus-visible:border-ink focus-visible:ring-0"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -72,10 +73,11 @@ export function CreateBoardDialog({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="board-desc">Description (optional)</Label>
+            <Label htmlFor="board-desc" className="font-handwriting text-base text-ink-medium">description (optional)</Label>
             <Textarea
               id="board-desc"
-              placeholder="What's the vibe? Any goals for this trip?"
+              placeholder="what's the vibe?"
+              className="border-dashed border-paper-kraft bg-transparent focus-visible:border-ink focus-visible:ring-0"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
@@ -85,15 +87,17 @@ export function CreateBoardDialog({
             <Button
               type="button"
               variant="outline"
+              className="border-dashed"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              cancel
             </Button>
             <Button
               type="submit"
+              className="kraft-paper text-ink border-none"
               disabled={!name.trim() || createBoard.isPending}
             >
-              {createBoard.isPending ? "Creating..." : "Create Board"}
+              {createBoard.isPending ? "creating..." : "create board"}
             </Button>
           </DialogFooter>
         </form>

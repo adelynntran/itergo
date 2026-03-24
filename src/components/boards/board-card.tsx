@@ -1,15 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { MapPin, Users, Crown, Edit3, Eye } from "lucide-react";
+import { modeConfig, roleConfig, getOrganicRotation, getTapeColor } from "@/lib/scrapbook";
 
 interface BoardCardProps {
   board: {
@@ -22,6 +15,7 @@ interface BoardCardProps {
     memberCount: number;
     pinCount: number;
   };
+  index?: number;
   selectMode?: boolean;
   isSelected?: boolean;
   onToggleSelect?: () => void;
@@ -33,99 +27,96 @@ const roleIcons: Record<string, React.ReactNode> = {
   viewer: <Eye className="h-3 w-3" />,
 };
 
-const roleColors: Record<string, string> = {
-  host: "bg-amber-100 text-amber-700",
-  editor: "bg-blue-100 text-blue-700",
-  viewer: "bg-gray-100 text-gray-700",
-};
-
-const modeColors: Record<string, string> = {
-  dream: "bg-indigo-100 text-indigo-700",
-  execution: "bg-emerald-100 text-emerald-700",
-  travel: "bg-orange-100 text-orange-700",
-};
-
 export function BoardCard({
   board,
+  index = 0,
   selectMode,
   isSelected,
   onToggleSelect,
 }: BoardCardProps) {
   const boardMode = board.boardMode ?? "dream";
+  const mode = modeConfig[boardMode] ?? modeConfig.dream;
+  const tapeColor = getTapeColor(index);
+  const rotation = getOrganicRotation(index);
+  const role = roleConfig[board.role];
 
   const content = (
-    <Card
-      className={`group cursor-pointer transition-all hover:shadow-md ${
-        isSelected ? "ring-2 ring-indigo-600" : ""
+    <div
+      className={`group relative cursor-pointer bg-paper p-3 pb-12 transition-all duration-300 polaroid-shadow hover:-translate-y-1 ${
+        isSelected ? "ring-2 ring-ink" : ""
       }`}
+      style={rotation}
     >
-      {/* Cover image placeholder */}
-      <div className="relative h-32 rounded-t-lg bg-gradient-to-br from-indigo-400 to-purple-500">
-        {selectMode && (
-          <div className="absolute left-3 top-3">
-            <div
-              className={`h-5 w-5 rounded border-2 ${
-                isSelected
-                  ? "border-indigo-600 bg-indigo-600"
-                  : "border-white bg-white/30"
-              } flex items-center justify-center`}
-            >
-              {isSelected && (
-                <svg
-                  className="h-3 w-3 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={3}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              )}
-            </div>
+      {/* Tape strips */}
+      <div
+        className={`absolute -top-3 left-[15%] z-10 h-5 w-10 ${tapeColor} rotate-[-5deg] opacity-80`}
+      />
+      <div
+        className={`absolute -top-3 right-[15%] z-10 h-5 w-10 ${getTapeColor(index + 2)} rotate-[3deg] opacity-80`}
+      />
+
+      {/* Select checkbox */}
+      {selectMode && (
+        <div className="absolute left-4 top-4 z-20">
+          <div
+            className={`checkbox-hand ${isSelected ? "checked" : ""}`}
+          />
+        </div>
+      )}
+
+      {/* Cover image */}
+      <div className="relative aspect-[4/3] overflow-hidden bg-paper-aged">
+        {board.coverImage ? (
+          <img
+            src={board.coverImage}
+            alt={board.name}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-paper-aged to-paper-kraft">
+            <span className="font-handwriting text-3xl text-ink-light">{mode.label}</span>
           </div>
         )}
-        <div className="absolute right-3 top-3 flex gap-1.5">
-          <Badge
-            variant="secondary"
-            className={`text-xs ${modeColors[boardMode] ?? ""}`}
-          >
-            {boardMode}
-          </Badge>
-          <Badge
-            variant="secondary"
-            className={`text-xs ${roleColors[board.role] ?? ""}`}
-          >
-            {roleIcons[board.role]}
-            <span className="ml-1 capitalize">{board.role}</span>
-          </Badge>
+        {/* Mode badge */}
+        <div
+          className={`absolute right-2 top-2 rounded-full px-2.5 py-0.5 text-sm font-medium ${mode.bg} ${mode.text}`}
+        >
+          {mode.label}
         </div>
       </div>
 
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base">{board.name}</CardTitle>
+      {/* Polaroid bottom area */}
+      <div className="mt-3.5 px-1">
+        <h3 className="truncate font-handwriting text-xl text-ink">
+          {board.name}
+        </h3>
         {board.description && (
-          <CardDescription className="line-clamp-2 text-xs">
+          <p className="mt-1 line-clamp-2 text-sm text-ink-light">
             {board.description}
-          </CardDescription>
+          </p>
         )}
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center gap-4 text-xs text-gray-500">
-          <span className="flex items-center gap-1">
-            <MapPin className="h-3.5 w-3.5" />
-            {board.pinCount} {board.pinCount === 1 ? "pin" : "pins"}
-          </span>
-          <span className="flex items-center gap-1">
-            <Users className="h-3.5 w-3.5" />
-            {board.memberCount} {board.memberCount === 1 ? "member" : "members"}
-          </span>
+        <div className="mt-2.5 flex items-center justify-between text-sm text-ink-light">
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1">
+              <MapPin className="h-3.5 w-3.5" />
+              {board.pinCount}
+            </span>
+            <span className="flex items-center gap-1">
+              <Users className="h-3.5 w-3.5" />
+              {board.memberCount}
+            </span>
+          </div>
+          {role && (
+            <span
+              className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs ${role.bg} ${role.text}`}
+            >
+              {roleIcons[board.role]}
+              <span className="capitalize">{board.role}</span>
+            </span>
+          )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 
   if (selectMode) {

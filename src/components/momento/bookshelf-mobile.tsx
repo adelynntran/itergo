@@ -26,7 +26,7 @@ export function BookshelfMobile({
   const router = useRouter();
 
   return (
-    <div className="flex gap-4 overflow-x-auto px-4 pb-4 snap-x snap-mandatory scrollbar-none">
+    <div className="flex gap-5 overflow-x-auto px-4 pb-5 snap-x snap-mandatory scrollbar-none">
       {boards.map((board) => {
         const coverUrl =
           board.coverImage ??
@@ -51,11 +51,11 @@ export function BookshelfMobile({
         return (
           <div
             key={board.id}
-            className="flex-shrink-0 snap-center cursor-pointer w-44"
+            className="w-52 flex-shrink-0 snap-center cursor-pointer"
             onClick={() => router.push(`/board/${board.id}`)}
           >
             {/* Book cover */}
-            <div className="relative h-56 w-full overflow-hidden rounded-lg shadow-md">
+            <div className="relative h-64 w-full overflow-hidden rounded-lg shadow-md">
               {coverUrl ? (
                 <img
                   src={coverUrl}
@@ -74,20 +74,20 @@ export function BookshelfMobile({
               )}
               {/* Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-3">
-                <h3 className="font-display text-sm font-semibold text-white leading-tight">
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <h3 className="font-display text-base font-semibold text-white leading-tight">
                   {board.name}
                 </h3>
                 {dateLabel && (
                   <div className="mt-1 flex items-center gap-1 text-white/70">
-                    <Calendar className="h-3 w-3" />
-                    <span className="text-xs">{dateLabel}</span>
+                    <Calendar className="h-3.5 w-3.5" />
+                    <span className="text-sm">{dateLabel}</span>
                   </div>
                 )}
                 {cities.length > 0 && (
                   <div className="mt-0.5 flex items-center gap-1 text-white/70">
-                    <MapPin className="h-3 w-3" />
-                    <span className="text-xs">{cities.join(", ")}</span>
+                    <MapPin className="h-3.5 w-3.5" />
+                    <span className="text-sm">{cities.join(", ")}</span>
                   </div>
                 )}
               </div>
@@ -98,12 +98,12 @@ export function BookshelfMobile({
 
       {/* Ghost card */}
       <div
-        className="flex h-56 w-44 flex-shrink-0 snap-center cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300/50"
+        className="flex h-64 w-52 flex-shrink-0 snap-center cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300/50"
         onClick={onGhostClick}
       >
         <div className="flex flex-col items-center gap-2 text-gray-400">
-          <Plus className="h-6 w-6" />
-          <span className="text-xs">New Memory</span>
+          <Plus className="h-7 w-7" />
+          <span className="text-sm">New Memory</span>
         </div>
       </div>
     </div>
