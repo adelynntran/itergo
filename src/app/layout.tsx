@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { DM_Sans, Playfair_Display, Caveat } from "next/font/google";
+import { DM_Sans, Playfair_Display } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 
@@ -13,9 +14,10 @@ const playfair = Playfair_Display({
   variable: "--font-display",
 });
 
-const caveat = Caveat({
-  subsets: ["latin"],
+const biroScriptPlus = localFont({
+  src: "../../public/fonts/biro-script-plus.ttf",
   variable: "--font-handwriting",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -32,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${dmSans.variable} ${playfair.variable} ${caveat.variable} paper-canvas paper-canvas-warm font-sans antialiased`}
+        className={`${dmSans.variable} ${playfair.variable} ${biroScriptPlus.variable} paper-canvas paper-canvas-warm font-sans antialiased`}
       >
         <Providers>{children}</Providers>
       </body>
