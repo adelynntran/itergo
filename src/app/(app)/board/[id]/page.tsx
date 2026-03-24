@@ -8,7 +8,7 @@ import { PinMap } from "@/components/pins/pin-map";
 import { PinList } from "@/components/pins/pin-list";
 import { AddPinSidebar } from "@/components/pins/add-pin-sidebar";
 import { BoardSettingsSheet } from "@/components/boards/board-settings-sheet";
-import { modeConfig, getTapeColor } from "@/lib/scrapbook";
+import { modeConfig } from "@/lib/scrapbook";
 import {
   Plus,
   List,
@@ -16,9 +16,6 @@ import {
   ArrowLeft,
   Settings,
   Users,
-  Cloud,
-  Sparkles,
-  Plane,
   BookOpen,
   Check,
 } from "lucide-react";
@@ -111,11 +108,10 @@ export default function BoardPage() {
 
             {/* Scrapbook grid */}
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {board.pins.map((pin: any, i: number) => {
+              {board.pins.map((pin, i) => {
                 const rotation = ((i % 5) - 2) * 1.2;
                 const coverUrl =
                   pin.media?.[0]?.thumbnail ?? pin.media?.[0]?.url ?? null;
-                const tapeColor = getTapeColor(i);
 
                 return (
                   <div
@@ -200,57 +196,6 @@ export default function BoardPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Mode progression */}
-          <div className="hidden items-center gap-1 rounded-xl bg-paper-aged/50 p-1 sm:flex">
-            <Button
-              variant={currentMode === "dream" ? "secondary" : "ghost"}
-              size="sm"
-              className={`h-7 px-2 ${currentMode === "dream" ? `${mode.bg} ${mode.text}` : "text-ink-light"}`}
-              disabled
-            >
-              <Cloud className="mr-1 h-3 w-3" />
-              Dream
-            </Button>
-            <Button
-              variant={currentMode === "execution" ? "secondary" : "ghost"}
-              size="sm"
-              className={`h-7 px-2 ${currentMode === "execution" ? "bg-execution-light text-execution-text" : "text-ink-light"}`}
-              disabled={
-                !canEdit ||
-                currentMode !== "dream" ||
-                updateBoardMode.isPending
-              }
-              onClick={() =>
-                updateBoardMode.mutate({
-                  boardId: board.id,
-                  boardMode: "execution",
-                })
-              }
-            >
-              <Sparkles className="mr-1 h-3 w-3" />
-              Execution
-            </Button>
-            <Button
-              variant={currentMode === "travel" ? "secondary" : "ghost"}
-              size="sm"
-              className={`h-7 px-2 ${currentMode === "travel" ? "bg-travel-light text-travel-text" : "text-ink-light"}`}
-              disabled={
-                !canEdit ||
-                currentMode !== "execution" ||
-                updateBoardMode.isPending
-              }
-              onClick={() =>
-                updateBoardMode.mutate({
-                  boardId: board.id,
-                  boardMode: "travel",
-                })
-              }
-            >
-              <Plane className="mr-1 h-3 w-3" />
-              Live
-            </Button>
-          </div>
-
           {/* Complete Trip button */}
           {currentMode === "travel" && canEdit && (
             <Button
